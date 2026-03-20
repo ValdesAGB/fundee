@@ -21,9 +21,14 @@ export default function Sidebar() {
 
 const handleLogout = async () => {
   try {
-    await fetch("/api/v1/business/auth/logout", { method: "POST" });
+    // ✅ Better Auth sign-out qui supprime le cookie
+    await fetch("/api/auth/sign-out", {
+      method: "POST",
+      credentials: "include",
+    });
   } finally {
-    router.push("/admin/login");
+    // ✅ window.location force un vrai rechargement
+    window.location.href = "/admin/login";
   }
 };
 
