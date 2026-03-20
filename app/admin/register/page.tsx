@@ -9,7 +9,7 @@ import {
   FieldLabel, FieldInput, FieldTextarea, Row, Column,
   SubmitBtn, Spinner, ErrorBox, LoginLink, Quote, Accent,
   SuccessIcon, SuccessTitle, SuccessText,
-} from "./Register.styles.ts";
+} from "./Register.styles";
 
 export default function RegisterPage() {
   const router = useRouter();
