@@ -20,8 +20,13 @@ export const POST = async (_req: NextRequest) => {
       { status: 200 }
     );
 
-    response.cookies.delete("better-auth.session_data");
+    // ✅ Cookies HTTP (développement)
     response.cookies.delete("better-auth.session_token");
+    response.cookies.delete("better-auth.session_data");
+
+    // ✅ Cookies HTTPS (production Vercel)
+    response.cookies.delete("__Secure-better-auth.session_token");
+    response.cookies.delete("__Secure-better-auth.session_data");
 
     return response;
   } catch (error) {
