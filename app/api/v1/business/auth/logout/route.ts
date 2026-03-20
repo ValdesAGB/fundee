@@ -20,13 +20,19 @@ export const POST = async (_req: NextRequest) => {
       { status: 200 }
     );
 
-    // ✅ Cookies HTTP (développement)
-    response.cookies.delete("better-auth.session_token");
-    response.cookies.delete("better-auth.session_data");
+    const cookieOptions = {
+      expires: new Date(0),
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      sameSite: "lax" as const,
+    };
 
-    // ✅ Cookies HTTPS (production Vercel)
-    response.cookies.delete("__Secure-better-auth.session_token");
-    response.cookies.delete("__Secure-better-auth.session_data");
+    // ✅ Force l'expiration avec les bons attributs
+    response.cookies.set("__Secure-better-auth.session_token", "", cookieOptions);
+    response.cookies.set("__Secure-better-auth.session_data", "", cookieOptions);
+    response.cookies.set("better-auth.session_token", "", { ...cookieOptions, secure: false });
+    response.cookies.set("better-auth.session_data", "", { ...cookieOptions, secure: false });
 
     return response;
   } catch (error) {
