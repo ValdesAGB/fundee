@@ -111,7 +111,6 @@ export default function EditProductPage() {
     e.preventDefault();
     setSaving(true);
     setError("");
-
     try {
       // ── Image ──
       let imagePayload: string[] = [];
