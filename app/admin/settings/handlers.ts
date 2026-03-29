@@ -6,6 +6,7 @@ interface Profile {
   phone: string;
   description: string;
   address: string;
+  avatar: string; // ← ajout
 }
 
 interface Passwords {
@@ -60,6 +61,7 @@ export async function saveProfile(e: React.FormEvent, params: ProfileParams) {
         phone: profile.phone,
         description: profile.description,
         address: profile.address,
+        avatar: profile.avatar, // ← ajout
       }),
     });
 
@@ -79,6 +81,7 @@ export async function saveProfile(e: React.FormEvent, params: ProfileParams) {
         phone: refreshData.data.phone || "",
         description: refreshData.data.description || "",
         address: refreshData.data.address || "",
+        avatar: refreshData.data.avatar || "", // ← ajout
       });
     }
 

@@ -130,8 +130,8 @@ export const AvatarBlock = styled.div`
 `;
 
 export const Avatar = styled.div`
-  width: 72px;
-  height: 72px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, #ff6b00, #016232);
   display: flex;
@@ -277,4 +277,140 @@ export const SuccessBox = styled.div`
   border-radius: 8px;
   margin-bottom: 20px;
   font-size: 13px;
+`;
+
+export const AvatarWrapper = styled.div`
+  position: relative;
+  cursor: pointer;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &:hover > div:last-child {
+    opacity: 1;
+  }
+`;
+
+
+export const AvatarImg = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+export const AvatarOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.2s;
+`;
+
+export const AvatarMenu = styled.div`
+  position: absolute;
+  top: 64px;
+  left: 0;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 100;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const AvatarSpinner = styled.div`
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "";
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+export const AvatarMenuItem = styled.button<{ $danger?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ $danger }) => ($danger ? "#dc2626" : "#374151")};
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+
+  &:hover {
+    background: ${({ $danger }) => ($danger ? "#fee2e2" : "#f3f4f6")};
+  }
+
+  i { font-size: 15px; }
+`;
+
+export const Modal = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+export const ModalImg = styled.img`
+  max-width: 480px;
+  max-height: 480px;
+  width: 90vw;
+  height: 90vw;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+`;
+
+export const ModalClose = styled.button`
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s;
+
+  &:hover { background: #f3f4f6; }
 `;

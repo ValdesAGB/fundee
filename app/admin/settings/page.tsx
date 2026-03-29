@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Sidebar from "@/app/admin/components/Sidebar";
 import { saveProfile, savePassword, deleteAccount } from "./handlers";
 import {
@@ -18,9 +18,17 @@ import {
   FieldTextarea,
   AvatarBlock,
   Avatar,
+  AvatarWrapper,
+  AvatarImg,
+  AvatarOverlay,
   AvatarInfo,
   AvatarName,
   AvatarRole,
+  AvatarMenu,
+  AvatarMenuItem,
+  Modal,
+  ModalImg,
+  ModalClose,
   SaveBtn,
   DangerBtn,
   ToggleRow,
@@ -30,6 +38,7 @@ import {
   Toggle,
   ErrorBox,
   SuccessBox,
+  AvatarSpinner,
 } from "./Settings.styles";
 import { Loader } from "../components/dots/Loader";
 
@@ -40,6 +49,7 @@ export default function SettingsPage() {
     phone: "",
     description: "",
     address: "",
+    avatar: "",
   });
 
   const [passwords, setPasswords] = useState({
@@ -56,11 +66,15 @@ export default function SettingsPage() {
 
   const [saving, setSaving] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -76,6 +90,7 @@ export default function SettingsPage() {
             phone: data.data.phone || "",
             description: data.data.description || "",
             address: data.data.address || "",
+            avatar: data.data.avatar || "",
           });
         }
       } catch {
@@ -86,12 +101,101 @@ export default function SettingsPage() {
     fetchProfile();
   }, []);
 
+  // ✅ Ferme le menu si clic en dehors
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowAvatarMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleProfileChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => setProfile({ ...profile, [e.target.name]: e.target.value });
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
+
+  // ✅ Upload nouvelle photo
+  const handleUploadAvatar = () => {
+    setShowAvatarMenu(false);
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      setAvatarUploading(true);
+      setError("");
+      setSuccess("");
+
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/v1/upload", {
+          method: "POST",
+          credentials: "include",
+          body: fd,
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Erreur upload avatar");
+
+        const newProfile = { ...profile, avatar: data.url };
+        setProfile(newProfile);
+
+        await fetch("/api/v1/business/auth/me", {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: newProfile.name,
+            phone: newProfile.phone,
+            description: newProfile.description,
+            address: newProfile.address,
+            avatar: data.url,
+          }),
+        });
+
+        setSuccess("Photo de profil mise à jour.");
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setAvatarUploading(false);
+      }
+    };
+    input.click();
+  };
+
+  // ✅ Supprimer la photo
+  const handleDeleteAvatar = async () => {
+    setShowAvatarMenu(false);
+    setError("");
+    setSuccess("");
+
+    try {
+      await fetch("/api/v1/business/auth/me", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: profile.name,
+          phone: profile.phone,
+          description: profile.description,
+          address: profile.address,
+          avatar: "",
+        }),
+      });
+
+      setProfile({ ...profile, avatar: "" });
+      setSuccess("Photo de profil supprimée.");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
 
   return (
     <Wrapper className="row">
@@ -106,10 +210,69 @@ export default function SettingsPage() {
           <Loader />
         ) : (
           <Section>
+            {error && <ErrorBox>{error}</ErrorBox>}
+            {success && <SuccessBox>{success}</SuccessBox>}
+
             <AvatarBlock>
-              <Avatar>
-                {profile.name ? profile.name.charAt(0).toUpperCase() : "P"}
-              </Avatar>
+              <div style={{ position: "relative" }} ref={menuRef}>
+                <AvatarWrapper
+                  onClick={() =>
+                    !avatarUploading && setShowAvatarMenu(!showAvatarMenu)
+                  }
+                  title="Options de la photo"
+                >
+                  {profile.avatar ? (
+                    <AvatarImg src={profile.avatar} alt="avatar" />
+                  ) : (
+                    <Avatar>
+                      {profile.name
+                        ? profile.name.charAt(0).toUpperCase()
+                        : "P"}
+                    </Avatar>
+                  )}
+
+                  {avatarUploading ? (
+                    <AvatarSpinner /> // ← spinner visible sans survol
+                  ) : (
+                    <AvatarOverlay>
+                      <i className="bi bi-camera" />
+                    </AvatarOverlay>
+                  )}
+                </AvatarWrapper>
+
+                {/* ── Menu ── */}
+                {showAvatarMenu && (
+                  <AvatarMenu>
+                    {profile.avatar && (
+                      <AvatarMenuItem
+                        type="button"
+                        onClick={() => {
+                          setShowAvatarMenu(false);
+                          setShowModal(true);
+                        }}
+                      >
+                        <i className="bi bi-eye" />
+                        Voir la photo
+                      </AvatarMenuItem>
+                    )}
+                    <AvatarMenuItem type="button" onClick={handleUploadAvatar}>
+                      <i className="bi bi-pencil" />
+                      {profile.avatar ? "Modifier" : "Ajouter une photo"}
+                    </AvatarMenuItem>
+                    {profile.avatar && (
+                      <AvatarMenuItem
+                        type="button"
+                        $danger
+                        onClick={handleDeleteAvatar}
+                      >
+                        <i className="bi bi-trash3" />
+                        Supprimer
+                      </AvatarMenuItem>
+                    )}
+                  </AvatarMenu>
+                )}
+              </div>
+
               <AvatarInfo>
                 <AvatarName>{profile.name || "Votre business"}</AvatarName>
                 <AvatarRole>BUSINESS</AvatarRole>
@@ -120,9 +283,6 @@ export default function SettingsPage() {
             <SectionSubtitle>
               Mettez à jour les informations de votre business.
             </SectionSubtitle>
-
-            {error && <ErrorBox>{error}</ErrorBox>}
-            {success && <SuccessBox>{success}</SuccessBox>}
 
             <form
               onSubmit={(e) =>
@@ -333,6 +493,20 @@ export default function SettingsPage() {
           </DangerBtn>
         </Section>*/}
       </Container>
+
+      {/* ── Modal photo ── */}
+      {showModal && profile.avatar && (
+        <Modal onClick={() => setShowModal(false)}>
+          <ModalClose onClick={() => setShowModal(false)}>
+            <i className="bi bi-x" />
+          </ModalClose>
+          <ModalImg
+            src={profile.avatar}
+            alt="Photo de profil"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </Modal>
+      )}
     </Wrapper>
   );
 }

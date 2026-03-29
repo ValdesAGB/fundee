@@ -75,6 +75,21 @@ const schemas: Record<string, SchemaObject> = {
             business: { $ref: '#/components/schemas/Business' },
         },
     },
+    ForgetPasswordRequest: {
+        type: 'object',
+        required: ['email'],
+        properties: {
+            email: { type: 'string', format: 'email', example: 'shop@example.com' },
+        },
+    },
+    ResetPasswordRequest: {
+        type: 'object',
+        required: ['token', 'password'],
+        properties: {
+            token: { type: 'string', minLength: 1 },
+            password: { type: 'string', minLength: 8 },
+        },
+    },
     Business: {
         type: 'object',
         properties: {
@@ -531,6 +546,75 @@ const paths: PathsObject = {
             security: [{ BusinessBearerAuth: [] }],
             responses: {
                 200: std.ok('Déconnecté — supprimez le token côté client'),
+                401: std.r401(),
+            },
+        },
+    },
+    '/api/v1/business/auth/forget-password': {
+        post: {
+            tags: ['Auth – Business'],
+            summary: 'Demander une réinitialisation de mot de passe',
+            requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ForgetPasswordRequest' } } } },
+            responses: {
+                200: std.ok('Lien envoyé (si le compte existe)'),
+                400: std.r400(),
+            },
+        },
+    },
+    '/api/v1/business/auth/reset-password': {
+        post: {
+            tags: ['Auth – Business'],
+            summary: 'Réinitialiser le mot de passe avec un jeton',
+            requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ResetPasswordRequest' } } } },
+            responses: {
+                200: std.ok('Mot de passe mis à jour'),
+                400: std.r400(),
+            },
+        },
+    },
+    '/api/v1/business/auth/verify-email': {
+        get: {
+            tags: ['Auth – Business'],
+            summary: 'Vérifier l\'adresse e-mail (lien cliquable)',
+            parameters: [{ name: 'token', in: 'query', required: true, schema: { type: 'string' } }],
+            responses: {
+                307: { description: 'Redirection vers le dashboard' },
+            },
+        },
+    },
+
+    // ── Business Profile ──────────────────────────────────────────────────────
+    '/api/v1/business/profile/logo': {
+        post: {
+            tags: ['Business Profile'],
+            summary: 'Mettre à jour le logo du commerce',
+            description: 'Supporte le téléchargement de fichiers multipart/form-data (image uniquement, max 5Mo).',
+            security: [{ BusinessBearerAuth: [] }],
+            requestBody: {
+                required: true,
+                content: {
+                    'multipart/form-data': {
+                        schema: {
+                            type: 'object',
+                            properties: {
+                                file: { type: 'string', format: 'binary', description: 'Le fichier image (jpg, png, webp)' },
+                            },
+                        },
+                    },
+                },
+            },
+            responses: {
+                200: std.ok('Logo mis à jour', { type: 'object', properties: { logo: { type: 'string' } } }),
+                400: std.r400(),
+                401: std.r401(),
+            },
+        },
+        delete: {
+            tags: ['Business Profile'],
+            summary: 'Supprimer le logo du commerce',
+            security: [{ BusinessBearerAuth: [] }],
+            responses: {
+                200: std.ok('Logo supprimé'),
                 401: std.r401(),
             },
         },
