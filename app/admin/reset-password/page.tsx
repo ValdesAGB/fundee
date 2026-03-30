@@ -24,7 +24,7 @@ import {
   SuccessBox,
   Quote,
   Accent,
-} from "./ForgotPassword.styles";
+} from "./ResetPassword.styles";
 
 const SlideDots = dynamic(() => import("../components/dots/Animation"), {
   ssr: false,
@@ -49,9 +49,7 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email, redirectTo: "/admin/reset-password" }),
       });
 
-      // ✅ Better Auth retourne parfois une réponse vide
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : {};
+      const data = await res.json();
 
       if (!res.ok) {
         throw { message: data?.message || "Erreur lors de l'envoi" };
@@ -81,7 +79,7 @@ export default function ForgotPasswordPage() {
           <Heading>Mot de passe oublié ?</Heading>
           <Sub>
             Entrez votre adresse email et nous vous enverrons un lien pour
-            réinitialiser votre mot de passe.
+         
           </Sub>
 
           {error && <ErrorBox>{error}</ErrorBox>}

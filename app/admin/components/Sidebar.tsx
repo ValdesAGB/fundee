@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import Cookies from "js-cookie"; 
+import Cookies from "js-cookie";
 
 const NAV_ITEMS = [
   {
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
     icon: "bi-box-seam",
     exact: true,
   },
+  { label: "Statistiques", href: "/admin/stats", icon: "bi bi-bar-chart-line" },
   { label: "Paramètres", href: "/admin/settings", icon: "bi-gear" },
 ];
 
@@ -19,13 +20,13 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
-const handleLogout = async () => {
-  try {
-    await fetch("/api/v1/business/auth/logout", { method: "POST" });
-  } finally {
-    router.push("/admin/login");
-  }
-};
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/v1/business/auth/logout", { method: "POST" });
+    } finally {
+      router.push("/admin/login");
+    }
+  };
 
   return (
     <Container>

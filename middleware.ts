@@ -5,6 +5,7 @@ const PUBLIC_ROUTES = [
   "/admin/login",
   "/admin/register",
   "/admin/forgot-password",
+  "/admin/reset-password",
 ];
 
 export function middleware(req: NextRequest) {
