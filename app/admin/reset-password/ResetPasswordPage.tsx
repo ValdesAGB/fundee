@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <Container className="row">
+    <Container className="">
       <Left>
         <FormWrap onSubmit={handleSubmit}>
           <Brand>
