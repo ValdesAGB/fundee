@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import {
   Container,
@@ -30,32 +31,54 @@ const SlideDots = dynamic(() => import("../components/dots/Animation"), {
   ssr: false,
 });
 
-export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
+export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get("token");
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // 🔌 Brancher la logique ici
+  useEffect(() => {
+    if (!token) {
+      setError("Lien de réinitialisation invalide ou expiré.");
+    }
+  }, [token]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
+    if (newPassword !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await fetch("/api/auth/forget-password", {
+      const res = await fetch("/api/v1/business/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, redirectTo: "/admin/reset-password" }),
+        body: JSON.stringify({ token, newPassword }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw { message: data?.message || "Erreur lors de l'envoi" };
+        throw new Error(data?.message || "Erreur lors de la réinitialisation");
       }
 
       setSuccess(true);
+      setTimeout(() => router.push("/admin/login"), 3000);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -73,13 +96,12 @@ export default function ForgotPasswordPage() {
           </Brand>
 
           <IconCircle>
-            <i className="bi bi-lock" />
+            <i className="bi bi-shield-lock" />
           </IconCircle>
 
-          <Heading>Mot de passe oublié ?</Heading>
+          <Heading>Nouveau mot de passe</Heading>
           <Sub>
-            Entrez votre adresse email et nous vous enverrons un lien pour
-         
+            Choisissez un nouveau mot de passe sécurisé pour votre compte.
           </Sub>
 
           {error && <ErrorBox>{error}</ErrorBox>}
@@ -87,26 +109,37 @@ export default function ForgotPasswordPage() {
           {success ? (
             <SuccessBox>
               <i className="bi bi-check-circle" style={{ marginRight: 8 }} />
-              Un email de réinitialisation a été envoyé à{" "}
-              <strong>{email}</strong>. Vérifiez votre boîte mail.
+              Mot de passe réinitialisé avec succès. Redirection vers la
+              connexion...
             </SuccessBox>
           ) : (
             <>
               <Field>
-                <FieldLabel>Adresse email</FieldLabel>
+                <FieldLabel>Nouveau mot de passe</FieldLabel>
                 <FieldInput
-                  type="email"
-                  name="email"
-                  placeholder="john@exemple.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
+                  type="password"
+                  placeholder="••••••••"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   required
+                  disabled={!token}
                 />
               </Field>
 
-              <SubmitBtn type="submit" disabled={loading}>
-                {loading ? <Spinner /> : "Envoyer le lien"}
+              <Field>
+                <FieldLabel>Confirmer le mot de passe</FieldLabel>
+                <FieldInput
+                  type="password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={!token}
+                />
+              </Field>
+
+              <SubmitBtn type="submit" disabled={loading || !token}>
+                {loading ? <Spinner /> : "Réinitialiser le mot de passe"}
               </SubmitBtn>
             </>
           )}
@@ -123,7 +156,6 @@ export default function ForgotPasswordPage() {
           <Quote>
             Reprenez le contrôle de votre <Accent>compte.</Accent>
           </Quote>
-
           <SlideDots
             count={3}
             autoPlay={true}

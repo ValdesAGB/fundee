@@ -43,13 +43,13 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/forget-password", {
+      const res = await fetch("/api/v1/business/auth/forget-password", {
+        // ✅ ta route custom
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, redirectTo: "/admin/reset-password" }),
+        body: JSON.stringify({ email }), // ✅ plus de redirectTo
       });
 
-      // ✅ Better Auth retourne parfois une réponse vide
       const text = await res.text();
       const data = text ? JSON.parse(text) : {};
 

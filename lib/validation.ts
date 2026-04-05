@@ -228,3 +228,18 @@ export async function validateBody<T>(
     return { success: false, error: "Requête invalide" };
   }
 }
+
+// ============================================
+// Auth Schemas
+// ============================================
+
+export const forgetPasswordSchema = z.object({
+  email: z.string().email("Adresse email invalide"),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token requis"),
+  newPassword: z
+    .string()
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+});

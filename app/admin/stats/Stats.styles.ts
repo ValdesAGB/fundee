@@ -14,7 +14,7 @@ export const Wrapper = styled.div`
   display: flex;
   min-height: 100vh;
   background: #f8fafc;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 export const Container = styled.div`
@@ -24,11 +24,14 @@ export const Container = styled.div`
 `;
 
 export const PageHeader = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
   margin-bottom: 36px;
 `;
 
 export const PageTitle = styled.h2`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: #0f172a;
@@ -41,37 +44,50 @@ export const PageSubtitle = styled.p`
   color: #94a3b8;
 `;
 
-/* ── KPI Cards ── */
+export const PeriodSelect = styled.select`
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:focus {
+    border-color: #ff6b00;
+  }
+`;
+
+/* ── KPI ── */
 export const KpiGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-bottom: 32px;
-
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  margin-bottom: 24px;
 `;
 
 export const KpiCard = styled.div<{ $color: string }>`
   background: white;
   border-radius: 14px;
   padding: 22px 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   border-left: 4px solid ${({ $color }) => $color};
   animation: ${fadeUp} 0.4s ease both;
   position: relative;
   overflow: hidden;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: -20px;
     right: -20px;
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: ${({ $color }) => $color}18;
+    background: ${({ $color }) => $color}14;
   }
 `;
 
@@ -92,8 +108,8 @@ export const KpiIcon = styled.div<{ $color: string }>`
 `;
 
 export const KpiValue = styled.p`
-  font-family: 'Montserrat', sans-serif;
-  font-size: 28px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 26px;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -1px;
@@ -106,34 +122,25 @@ export const KpiLabel = styled.p`
   font-weight: 500;
 `;
 
-export const KpiTrend = styled.span<{ $up: boolean }>`
+export const KpiSub = styled.p`
   font-size: 11px;
-  font-weight: 600;
-  color: ${({ $up }) => ($up ? "#16a34a" : "#dc2626")};
-  background: ${({ $up }) => ($up ? "#f0fdf4" : "#fef2f2")};
-  padding: 2px 8px;
-  border-radius: 20px;
+  color: #94a3b8;
   margin-top: 6px;
-  display: inline-block;
 `;
 
-/* ── Section ── */
+/* ── Sections ── */
 export const SectionGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 20px;
-
-  @media (max-width: 1100px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 export const Section = styled.div`
   background: white;
   border-radius: 14px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 `;
 
 export const SectionFull = styled(Section)`
@@ -148,7 +155,7 @@ export const SectionHeader = styled.div`
 `;
 
 export const SectionTitle = styled.h3`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: #0f172a;
@@ -162,11 +169,11 @@ export const SectionBadge = styled.span`
   border-radius: 20px;
 `;
 
-/* ── Product Row ── */
+/* ── Product rows ── */
 export const ProductList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
 `;
 
 export const ProductRow = styled.div`
@@ -176,15 +183,17 @@ export const ProductRow = styled.div`
   padding: 10px 0;
   border-bottom: 1px solid #f1f5f9;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 export const ProductRank = styled.span`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: #cbd5e1;
-  width: 20px;
+  width: 24px;
   flex-shrink: 0;
 `;
 
@@ -215,6 +224,7 @@ export const ProductName = styled.p`
 export const ProductMeta = styled.p`
   font-size: 11px;
   color: #94a3b8;
+  margin-bottom: 4px;
 `;
 
 export const ProductStat = styled.div`
@@ -223,7 +233,7 @@ export const ProductStat = styled.div`
 `;
 
 export const StatValue = styled.p`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: #0f172a;
@@ -234,12 +244,10 @@ export const StatLabel = styled.p`
   color: #94a3b8;
 `;
 
-/* ── Progress bar ── */
 export const ProgressBar = styled.div`
   height: 4px;
   background: #f1f5f9;
   border-radius: 2px;
-  margin-top: 6px;
   overflow: hidden;
 `;
 
@@ -251,19 +259,73 @@ export const ProgressFill = styled.div<{ $pct: number; $color: string }>`
   transition: width 0.6s ease;
 `;
 
-/* ── Rating stars ── */
-export const Stars = styled.div`
+/* ── Status badges ── */
+export const StatusGrid = styled.div`
   display: flex;
-  gap: 2px;
-  margin-top: 2px;
+  flex-wrap: wrap;
+  gap: 12px;
 `;
 
-export const Star = styled.i<{ $filled: boolean }>`
+export const StatusItem = styled.div<{ $color: string }>`
+  flex: 1;
+  min-width: 100px;
+  background: ${({ $color }) => $color}10;
+  border: 1px solid ${({ $color }) => $color}25;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+`;
+
+export const StatusCount = styled.p<{ $color: string }>`
+  font-family: "Montserrat", sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: ${({ $color }) => $color};
+  margin-bottom: 2px;
+`;
+
+export const StatusName = styled.p`
   font-size: 11px;
-  color: ${({ $filled }) => ($filled ? "#f59e0b" : "#e2e8f0")};
+  font-weight: 600;
+  color: #64748b;
+  text-transform: capitalize;
 `;
 
-/* ── Empty state ── */
+/* ── Trend ── */
+export const TrendGrid = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  height: 80px;
+  padding-top: 8px;
+`;
+
+export const TrendBar = styled.div<{ $pct: number; $color: string }>`
+  flex: 1;
+  height: ${({ $pct }) => Math.max($pct, 4)}%;
+  background: ${({ $color }) => $color};
+  border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease;
+  position: relative;
+  cursor: pointer;
+
+  &:hover::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0f172a;
+    color: white;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 10;
+  }
+`;
+
+/* ── Empty / Skeleton ── */
 export const EmptyState = styled.div`
   text-align: center;
   padding: 40px 20px;
@@ -281,10 +343,20 @@ export const EmptyState = styled.div`
   }
 `;
 
-/* ── Loading skeleton ── */
 export const Skeleton = styled.div`
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
   animation: ${shimmer} 1.5s infinite;
   border-radius: 8px;
+`;
+
+export const ErrorMsg = styled.p`
+  color: #dc2626;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  margin-bottom: 24px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 12px 16px;
+  border-radius: 10px;
 `;

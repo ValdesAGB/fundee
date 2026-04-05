@@ -2,75 +2,46 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { bearer } from "better-auth/plugins";
 import { db } from "@/lib/db";
+import { sendBusinessResetPasswordEmail } from "@/lib/mail";
 
 export const auth = betterAuth({
   database: mongodbAdapter(db),
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 
-  /**
-   * Email + password authentication
-   */
   emailAndPassword: {
     enabled: true,
-    // bcrypt cost factor (default: 10, we keep 12 for security)
     hashOptions: { rounds: 12 },
-  },
-
-  /**
-   * Bearer token plugin — enables Authorization: Bearer <token> in addition
-   * to cookies. Required for the Flutter mobile app which uses Dio + JWT-like
-   * header-based auth.
-   */
-  plugins: [bearer()],
-
-  /**
-   * Session configuration
-   */
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // extend by 1 day on each use
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // 5-minute client-side cache
+    sendResetPassword: async ({ user, url }) => {
+      // Extraire le token de l'URL générée par Better Auth
+      const token = new URL(url).searchParams.get("token") || "";
+      await sendBusinessResetPasswordEmail(user.email, url);
     },
   },
 
-  /**
-   * Additional fields stored on the User model beyond the better-auth defaults
-   * (id, email, name, image, emailVerified, createdAt, updatedAt)
-   */
+  plugins: [bearer()],
+
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
+
   user: {
     additionalFields: {
-      firstName: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-      lastName: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-      phone: {
-        type: "string",
-        required: false,
-        input: true,
-      },
+      firstName: { type: "string", required: false, input: true },
+      lastName: { type: "string", required: false, input: true },
+      phone: { type: "string", required: false, input: true },
       role: {
         type: "string",
         required: false,
         defaultValue: "BUSINESS",
         input: true,
       },
-      description: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-      address: {
-        type: "string",
-        required: false,
-        input: true,
-      },
+      description: { type: "string", required: false, input: true },
+      address: { type: "string", required: false, input: true },
       notificationsEnabled: {
         type: "boolean",
         required: false,
@@ -81,10 +52,6 @@ export const auth = betterAuth({
   },
 });
 
-/**
- * Convenience type for the authenticated user returned by better-auth sessions.
- * Mirrors the old TokenPayload interface used throughout the middleware.
- */
 export type AuthUser = {
   id: string;
   email: string;
@@ -100,9 +67,6 @@ export type AuthUser = {
   updatedAt: Date;
 };
 
-// ─── Legacy Business JWT helpers ─────────────────────────────────────────────
-// Business accounts are NOT managed by better-auth (they are a separate entity).
-// We keep a minimal JWT implementation scoped to Business auth only.
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
