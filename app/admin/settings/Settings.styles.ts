@@ -4,21 +4,32 @@ export const Wrapper = styled.div`
   display: flex;
   min-height: 100vh;
   background: #f8fafc;
-  font-family: 'Poppins', sans-serif;
 `;
 
 export const Container = styled.div`
   flex: 1;
   padding: 48px 52px;
+
+  @media (max-width: 1024px) {
+    padding: 40px 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 72px 16px 24px;
+  }
 `;
 
 export const PageTitle = styled.h2`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.4px;
   margin-bottom: 6px;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
 `;
 
 export const PageSubtitle = styled.p`
@@ -33,10 +44,14 @@ export const Section = styled.div`
   padding: 32px;
   margin-bottom: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 768px) {
+    padding: 24px 16px;
+  }
 `;
 
 export const SectionTitle = styled.h3`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
@@ -58,6 +73,11 @@ export const Divider = styled.div`
 export const Row = styled.div`
   display: flex;
   gap: 20px;
+
+  @media (max-width: 580px) {
+    flex-direction: column;
+    gap: 0;
+  }
 `;
 
 export const Column = styled.div`
@@ -78,15 +98,20 @@ export const FieldInput = styled.input`
   padding: 12px 14px;
   border-radius: 10px;
   border: 1.5px solid #e2e8f0;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   color: #0f172a;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 20px;
 
-  &::placeholder { color: #cbd5e1; }
+  &::placeholder {
+    color: #cbd5e1;
+  }
 
   &:focus {
     border-color: #ff6b00;
@@ -104,7 +129,7 @@ export const FieldTextarea = styled.textarea`
   padding: 12px 14px;
   border-radius: 10px;
   border: 1.5px solid #e2e8f0;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   color: #0f172a;
   outline: none;
@@ -112,9 +137,14 @@ export const FieldTextarea = styled.textarea`
   height: 100px;
   width: 100%;
   box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
-  &::placeholder { color: #cbd5e1; }
+  &::placeholder {
+    color: #cbd5e1;
+  }
 
   &:focus {
     border-color: #ff6b00;
@@ -127,6 +157,11 @@ export const AvatarBlock = styled.div`
   align-items: center;
   gap: 20px;
   margin-bottom: 24px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `;
 
 export const Avatar = styled.div`
@@ -137,7 +172,7 @@ export const Avatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: white;
@@ -169,7 +204,7 @@ export const SaveBtn = styled.button`
   border: none;
   background: #ff6b00;
   color: white;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -187,6 +222,11 @@ export const SaveBtn = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  @media (max-width: 480px) {
+    width: 100%;
+    justify-content: center;
+  }
 `;
 
 export const DangerBtn = styled.button`
@@ -195,7 +235,7 @@ export const DangerBtn = styled.button`
   border: none;
   background: #fee2e2;
   color: #dc2626;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -217,7 +257,9 @@ export const ToggleRow = styled.div`
   padding: 16px 0;
   border-bottom: 1px solid #f1f5f9;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 export const ToggleInfo = styled.div``;
@@ -246,7 +288,7 @@ export const Toggle = styled.button<{ $active: boolean }>`
   flex-shrink: 0;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 18px;
     height: 18px;
@@ -255,7 +297,7 @@ export const Toggle = styled.button<{ $active: boolean }>`
     top: 3px;
     left: ${({ $active }) => ($active ? "23px" : "3px")};
     transition: left 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   }
 `;
 
@@ -291,7 +333,6 @@ export const AvatarWrapper = styled.div`
     opacity: 1;
   }
 `;
-
 
 export const AvatarImg = styled.img`
   width: 100%;
@@ -348,7 +389,9 @@ export const AvatarSpinner = styled.div`
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -372,7 +415,9 @@ export const AvatarMenuItem = styled.button<{ $danger?: boolean }>`
     background: ${({ $danger }) => ($danger ? "#fee2e2" : "#f3f4f6")};
   }
 
-  i { font-size: 15px; }
+  i {
+    font-size: 15px;
+  }
 `;
 
 export const Modal = styled.div`
@@ -412,5 +457,7 @@ export const ModalClose = styled.button`
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition: background 0.2s;
 
-  &:hover { background: #f3f4f6; }
+  &:hover {
+    background: #f3f4f6;
+  }
 `;

@@ -13,6 +13,12 @@ export const Container = styled.div`
   display: flex;
   font-family: "Poppins", sans-serif;
   overflow: hidden;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    overflow: auto;
+  }
 `;
 
 export const Left = styled.div`
@@ -25,6 +31,23 @@ export const Left = styled.div`
   padding: 40px;
   overflow-y: auto;
   animation: ${fadeUp} 0.6s ease both;
+
+  @media (min-width: 1200px) {
+    width: 50%;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1024px) {
+    width: 460px;
+    padding: 32px;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 32px 24px;
+    min-height: 100vh;
+    align-items: flex-start;
+  }
 `;
 
 export const Form = styled.form`
@@ -33,6 +56,10 @@ export const Form = styled.form`
   display: flex;
   flex-direction: column;
   padding: 20px 0;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 `;
 
 export const Right = styled.div`
@@ -43,6 +70,11 @@ export const Right = styled.div`
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  @media (min-width: 1200px) {
+    width: 50%;
+    flex: none;
+  }
 
   &::before {
     content: "";
@@ -65,6 +97,10 @@ export const Right = styled.div`
     bottom: -80px;
     left: -80px;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const RightInner = styled.div`
@@ -76,6 +112,10 @@ export const RightInner = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 32px;
+
+  @media (max-width: 1024px) {
+    padding: 40px;
+  }
 `;
 
 export const Quote = styled.h2`
@@ -86,6 +126,10 @@ export const Quote = styled.h2`
   line-height: 1.4;
   max-width: 380px;
   margin: 0 auto;
+
+  @media (max-width: 1024px) {
+    font-size: 22px;
+  }
 `;
 
 export const Accent = styled.span`
@@ -121,6 +165,10 @@ export const Title = styled.h2`
   color: #0a2540;
   margin-bottom: 6px;
   letter-spacing: -0.5px;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
 `;
 
 export const Subtitle = styled.p`
@@ -212,6 +260,11 @@ export const FieldTextarea = styled.textarea`
 export const Row = styled.div`
   display: flex;
   gap: 16px;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0;
+  }
 `;
 
 export const Column = styled.div`
@@ -295,6 +348,10 @@ export const SuccessCard = styled.div`
   gap: 20px;
   height: 100%;
   padding: 60px 40px;
+
+  @media (max-width: 768px) {
+    padding: 40px 24px;
+  }
 `;
 
 export const SuccessIcon = styled.div`
@@ -307,6 +364,10 @@ export const SuccessTitle = styled.h2`
   font-size: 24px;
   font-weight: 700;
   color: #0f172a;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 export const SuccessText = styled.p`

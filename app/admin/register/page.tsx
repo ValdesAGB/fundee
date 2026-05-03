@@ -4,11 +4,32 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SlideDots from "../components/dots/Animation";
 import {
-  Container, Left, Right, RightInner, Form, SuccessCard,
-  Brand, BrandDot, BrandName, Title, Subtitle, Field,
-  FieldLabel, FieldInput, FieldTextarea, Row, Column,
-  SubmitBtn, Spinner, ErrorBox, LoginLink, Quote, Accent,
-  SuccessIcon, SuccessTitle, SuccessText,
+  Container,
+  Left,
+  Right,
+  RightInner,
+  Form,
+  SuccessCard,
+  Brand,
+  BrandDot,
+  BrandName,
+  Title,
+  Subtitle,
+  Field,
+  FieldLabel,
+  FieldInput,
+  FieldTextarea,
+  Row,
+  Column,
+  SubmitBtn,
+  Spinner,
+  ErrorBox,
+  LoginLink,
+  Quote,
+  Accent,
+  SuccessIcon,
+  SuccessTitle,
+  SuccessText,
 } from "./Register.styles";
 
 export default function RegisterPage() {
@@ -76,7 +97,8 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw { message: data?.message || "Erreur lors de l'inscription" };
+      if (!res.ok)
+        throw { message: data?.message || "Erreur lors de l'inscription" };
 
       setSuccess(true);
     } catch (err: any) {
@@ -101,7 +123,10 @@ export default function RegisterPage() {
               Votre compte business a été créé. Vous pouvez maintenant vous
               connecter et commencer à gérer votre activité.
             </SuccessText>
-            <SubmitBtn type="button" onClick={() => router.push("/admin/login")}>
+            <SubmitBtn
+              type="button"
+              onClick={() => router.push("/admin/login")}
+            >
               OK, se connecter
             </SubmitBtn>
           </SuccessCard>
@@ -119,7 +144,7 @@ export default function RegisterPage() {
 
             <Row>
               <Column>
-                <FieldLabel>Nom</FieldLabel>
+                <FieldLabel>Nom du business</FieldLabel>
                 <FieldInput
                   type="text"
                   name="name"

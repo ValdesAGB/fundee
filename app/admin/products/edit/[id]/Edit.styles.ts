@@ -10,6 +10,14 @@ export const Wrapper = styled.div`
 export const Container = styled.main`
   flex: 1;
   padding: 40px;
+
+  @media (max-width: 1024px) {
+    padding: 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 72px 16px 24px;
+  }
 `;
 
 export const BackLink = styled(Link)`
@@ -23,17 +31,23 @@ export const BackLink = styled(Link)`
   font-weight: 500;
   font-family: "Poppins", sans-serif;
 
-  &:hover { color: #ff6b00; }
+  &:hover {
+    color: #ff6b00;
+  }
 `;
 
 export const Card = styled.form`
-  max-width: 660px;
+  width: 100%;
   background: white;
   padding: 40px;
   border-radius: 16px;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    padding: 24px 20px;
+  }
 `;
 
 export const PageTitle = styled.h1`
@@ -42,6 +56,10 @@ export const PageTitle = styled.h1`
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 4px;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const PageSubtitle = styled.p`
@@ -111,6 +129,11 @@ export const FieldSelect = styled.select`
 export const Row = styled.div`
   display: flex;
   gap: 20px;
+
+  @media (max-width: 580px) {
+    flex-direction: column;
+    gap: 0;
+  }
 `;
 
 export const Column = styled.div`
@@ -144,7 +167,9 @@ export const NewCatLink = styled.span`
   display: block;
   font-family: "Poppins", sans-serif;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 export const SectionLabel = styled.p`
@@ -172,6 +197,11 @@ export const ImageTab = styled.button<{ $active: boolean }>`
   font-size: 13px;
   cursor: pointer;
   transition: 0.2s;
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+    padding: 8px;
+  }
 `;
 
 export const ImagePreview = styled.img`
@@ -196,8 +226,13 @@ export const SubmitBtn = styled.button`
   margin-top: 10px;
   transition: background 0.2s;
 
-  &:hover { background: #e55d00; }
-  &:disabled { opacity: 0.6; cursor: not-allowed; }
+  &:hover {
+    background: #e55d00;
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `;
 
 export const ErrorBox = styled.div`
@@ -223,6 +258,10 @@ export const SuccessCard = styled.div`
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   max-width: 480px;
   width: 100%;
+
+  @media (max-width: 768px) {
+    padding: 40px 24px;
+  }
 `;
 
 export const SuccessIcon = styled.div`
@@ -235,6 +274,10 @@ export const SuccessTitle = styled.h2`
   font-size: 22px;
   font-weight: 700;
   color: #0f172a;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const SuccessText = styled.p`

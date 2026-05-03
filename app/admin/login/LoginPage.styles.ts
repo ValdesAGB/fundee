@@ -13,9 +13,16 @@ export const spin = keyframes`
 export const Container = styled.div`
   display: flex;
   height: 100vh;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   overflow: hidden;
-   width: 100%;  
+  width: 100%;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
 `;
 
 export const Left = styled.div`
@@ -27,6 +34,25 @@ export const Left = styled.div`
   justify-content: center;
   padding: 48px 40px;
   animation: ${fadeUp} 0.6s ease both;
+
+  /* À partir de 1200px — même largeur que Right */
+  @media (min-width: 1200px) {
+    width: 50%;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1024px) {
+    width: 420px;
+    padding: 40px 32px;
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 40px 24px;
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: 48px;
+  }
 `;
 
 export const FormWrap = styled.form`
@@ -34,6 +60,10 @@ export const FormWrap = styled.form`
   max-width: 360px;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
 `;
 
 export const Right = styled.div`
@@ -45,8 +75,14 @@ export const Right = styled.div`
   justify-content: center;
   overflow: hidden;
 
+  /* À partir de 1200px — même largeur que Left */
+  @media (min-width: 1200px) {
+    width: 50%;
+    flex: none;
+  }
+
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 500px;
     height: 500px;
@@ -57,7 +93,7 @@ export const Right = styled.div`
   }
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 300px;
     height: 300px;
@@ -65,6 +101,10 @@ export const Right = styled.div`
     border: 1px solid rgba(255, 255, 255, 0.06);
     bottom: -80px;
     left: -80px;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -77,6 +117,10 @@ export const RightInner = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 32px;
+
+  @media (max-width: 1024px) {
+    padding: 40px;
+  }
 `;
 
 export const Brand = styled.div`
@@ -94,7 +138,7 @@ export const BrandDot = styled.div`
 `;
 
 export const BrandName = styled.span`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 700;
   font-size: 18px;
   color: #0a2540;
@@ -102,12 +146,16 @@ export const BrandName = styled.span`
 `;
 
 export const Heading = styled.h1`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 30px;
   font-weight: 800;
   color: #0a2540;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
+
+  @media (max-width: 768px) {
+    font-size: 26px;
+  }
 `;
 
 export const Sub = styled.p`
@@ -134,13 +182,17 @@ export const FieldInput = styled.input`
   padding: 13px 14px;
   border-radius: 10px;
   border: 1.5px solid #e5e7eb;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   color: #111827;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   outline: none;
 
-  &::placeholder { color: #c4c4c4; }
+  &::placeholder {
+    color: #c4c4c4;
+  }
 
   &:focus {
     border-color: #016232;
@@ -160,7 +212,9 @@ export const Forgot = styled(Link)`
   cursor: pointer;
   font-weight: 500;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 export const SubmitBtn = styled.button`
@@ -169,11 +223,13 @@ export const SubmitBtn = styled.button`
   border-radius: 10px;
   background: #016232;
   color: white;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,7 +266,9 @@ export const Footer = styled.p`
     font-weight: 600;
     text-decoration: none;
 
-    &:hover { text-decoration: underline; }
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `;
 
@@ -225,13 +283,17 @@ export const ErrorBox = styled.div`
 `;
 
 export const Quote = styled.h2`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 28px;
   font-weight: 700;
   color: white;
   line-height: 1.4;
   max-width: 380px;
   margin: 0 auto;
+
+  @media (max-width: 1024px) {
+    font-size: 22px;
+  }
 `;
 
 export const Accent = styled.span`

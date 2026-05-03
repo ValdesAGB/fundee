@@ -3,7 +3,7 @@
 import styled from "styled-components";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+import { useState } from "react";
 
 const NAV_ITEMS = [
   {
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -29,49 +30,94 @@ export default function Sidebar() {
   };
 
   return (
-    <Container>
-      {/* ── Brand ── */}
-      <Brand>
-        <BrandDot />
-        <BrandName>Fundee</BrandName>
-      </Brand>
+    <>
+      {/* ── Burger mobile ── */}
+      <Burger onClick={() => setOpen(!open)}>
+        <i className={`bi ${open ? "bi-x" : "bi-list"}`} />
+      </Burger>
 
-      {/* ── Nav ── */}
-      <Nav>
-        {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.href}
-            href={item.href}
-            $active={
-              item.exact
+      {/* ── Overlay mobile ── */}
+      {open && <Overlay onClick={() => setOpen(false)} />}
+
+      <Container $open={open}>
+        {/* ── Brand ── */}
+        <Brand>
+          <BrandDot />
+          <BrandName>Fundee</BrandName>
+        </Brand>
+
+        {/* ── Nav ── */}
+        <Nav>
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.href}
+              href={item.href}
+              onClick={() => setOpen(false)}
+              $active={
+                item.exact
+                  ? pathname === item.href
+                  : pathname.startsWith(item.href)
+              }
+            >
+              <i className={`bi ${item.icon}`} />
+              <span>{item.label}</span>
+              {(item.exact
                 ? pathname === item.href
-                : pathname.startsWith(item.href)
-            } // ✅
-          >
-            <i className={`bi ${item.icon}`} />
-            <span>{item.label}</span>
-            {(item.exact
-              ? pathname === item.href
-              : pathname.startsWith(item.href)) && <ActiveBar />}{" "}
-          </NavLink>
-        ))}
-      </Nav>
+                : pathname.startsWith(item.href)) && <ActiveBar />}
+            </NavLink>
+          ))}
+        </Nav>
 
-      {/* ── Bottom ── */}
-      <Bottom>
-        <Divider />
-        <LogoutBtn onClick={handleLogout}>
-          <i className="bi bi-box-arrow-left" />
-          <span>Déconnexion</span>
-        </LogoutBtn>
-      </Bottom>
-    </Container>
+        {/* ── Bottom ── */}
+        <Bottom>
+          <Divider />
+          <LogoutBtn onClick={handleLogout}>
+            <i className="bi bi-box-arrow-left" />
+            <span>Déconnexion</span>
+          </LogoutBtn>
+        </Bottom>
+      </Container>
+    </>
   );
 }
 
 /* ── Styles ── */
 
-const Container = styled.aside`
+const Burger = styled.button`
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  background: #0f172a;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 20px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
+const Overlay = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+`;
+
+const Container = styled.aside<{ $open: boolean }>`
   width: 240px;
   min-height: 100vh;
   background: #0f172a;
@@ -81,6 +127,24 @@ const Container = styled.aside`
   position: sticky;
   top: 0;
   flex-shrink: 0;
+  z-index: 100;
+
+  @media (max-width: 1024px) {
+    width: 200px;
+    padding: 24px 12px;
+  }
+
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+    transform: ${({ $open }) =>
+      $open ? "translateX(0)" : "translateX(-100%)"};
+    transition: transform 0.25s ease;
+    padding: 28px 16px;
+  }
 `;
 
 const Brand = styled.div`

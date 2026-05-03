@@ -4,7 +4,7 @@ export const Wrapper = styled.div`
   display: flex;
   min-height: 100vh;
   background: #f8fafc;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 export const Container = styled.div`
@@ -13,6 +13,14 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @media (max-width: 1024px) {
+    padding: 40px 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 72px 16px 24px;
+  }
 `;
 
 export const Card = styled.form`
@@ -24,15 +32,28 @@ export const Card = styled.form`
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    padding: 24px 20px;
+  }
+
+  @media (min-width: 1440px) {
+    width: 100%;
+    max-width: 100%;
+  }
 `;
 
 export const PageTitle = styled.h2`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 24px;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.4px;
   margin-bottom: 6px;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 export const PageSubtitle = styled.p`
@@ -56,13 +77,17 @@ export const FieldInput = styled.input`
   margin-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   color: #0f172a;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
-  &::placeholder { color: #cbd5e1; }
+  &::placeholder {
+    color: #cbd5e1;
+  }
 
   &:focus {
     border-color: #ff6b00;
@@ -84,13 +109,17 @@ export const FieldTextarea = styled.textarea`
   height: 100px;
   width: 100%;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   color: #0f172a;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
-  &::placeholder { color: #cbd5e1; }
+  &::placeholder {
+    color: #cbd5e1;
+  }
 
   &:focus {
     border-color: #ff6b00;
@@ -104,7 +133,7 @@ export const FieldSelect = styled.select`
   border: 1.5px solid #e2e8f0;
   margin-bottom: 8px;
   width: 100%;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 14px;
   color: #0f172a;
   outline: none;
@@ -112,12 +141,19 @@ export const FieldSelect = styled.select`
   cursor: pointer;
   transition: border-color 0.2s;
 
-  &:focus { border-color: #ff6b00; }
+  &:focus {
+    border-color: #ff6b00;
+  }
 `;
 
 export const Row = styled.div`
   display: flex;
   gap: 20px;
+
+  @media (max-width: 580px) {
+    flex-direction: column;
+    gap: 0;
+  }
 `;
 
 export const Column = styled.div`
@@ -139,7 +175,7 @@ export const Toggle = styled.button<{ $active: boolean }>`
   cursor: pointer;
   background: ${({ $active }) => ($active ? "#ff6b00" : "#f1f5f9")};
   color: ${({ $active }) => ($active ? "white" : "#64748b")};
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   transition: 0.2s;
 `;
@@ -152,7 +188,9 @@ export const NewCatLink = styled.span`
   display: block;
   font-weight: 500;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 export const ImageTabs = styled.div`
@@ -168,11 +206,16 @@ export const ImageTab = styled.button<{ $active: boolean }>`
   border: 2px solid ${({ $active }) => ($active ? "#ff6b00" : "#e2e8f0")};
   background: ${({ $active }) => ($active ? "#fff5ee" : "white")};
   color: ${({ $active }) => ($active ? "#ff6b00" : "#94a3b8")};
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
   transition: 0.2s;
+
+  @media (max-width: 480px) {
+    font-size: 12px;
+    padding: 8px;
+  }
 `;
 
 export const ImagePreview = styled.img`
@@ -190,12 +233,14 @@ export const SubmitBtn = styled.button`
   border: none;
   background: #ff6b00;
   color: white;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
   margin-top: 10px;
-  transition: background 0.2s, transform 0.1s;
+  transition:
+    background 0.2s,
+    transform 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -229,7 +274,6 @@ export const SectionLabel = styled.p`
   margin-bottom: 10px;
 `;
 
-
 export const SuccessCard = styled.div`
   display: flex;
   flex-direction: column;
@@ -243,6 +287,10 @@ export const SuccessCard = styled.div`
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   max-width: 480px;
   width: 100%;
+
+  @media (max-width: 768px) {
+    padding: 40px 24px;
+  }
 `;
 
 export const SuccessIcon = styled.div`
@@ -255,6 +303,10 @@ export const SuccessTitle = styled.h2`
   font-size: 22px;
   font-weight: 700;
   color: #0f172a;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const SuccessText = styled.p`

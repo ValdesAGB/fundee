@@ -6,12 +6,31 @@ import Sidebar from "@/app/admin/components/Sidebar";
 import { Loader } from "@/app/admin/components/dots/Loader";
 
 import {
-  Wrapper, Container, BackLink, Card, PageTitle, PageSubtitle,
-  FieldLabel, FieldInput, FieldTextarea, FieldSelect,
-  Row, Column, PromoHeader, Toggle, NewCatLink,
-  ImageTabs, ImageTab, ImagePreview, SubmitBtn,
-  ErrorBox, SectionLabel, SuccessCard, SuccessIcon,
-  SuccessTitle, SuccessText,
+  Wrapper,
+  Container,
+  BackLink,
+  Card,
+  PageTitle,
+  PageSubtitle,
+  FieldLabel,
+  FieldInput,
+  FieldTextarea,
+  FieldSelect,
+  Row,
+  Column,
+  PromoHeader,
+  Toggle,
+  NewCatLink,
+  ImageTabs,
+  ImageTab,
+  ImagePreview,
+  SubmitBtn,
+  ErrorBox,
+  SectionLabel,
+  SuccessCard,
+  SuccessIcon,
+  SuccessTitle,
+  SuccessText,
 } from "./Edit.styles";
 
 interface Category {
@@ -41,7 +60,9 @@ export default function EditProductPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/v1/categories", { credentials: "include" });
+        const res = await fetch("/api/v1/categories", {
+          credentials: "include",
+        });
         const data = await res.json();
         if (res.ok) setCategories(data.data || []);
       } catch {}
@@ -56,12 +77,14 @@ export default function EditProductPage() {
           credentials: "include",
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Erreur récupération produit");
+        if (!res.ok)
+          throw new Error(data.message || "Erreur récupération produit");
 
         const product = data.data;
         setFormData(product);
 
-        if (product.compareAtPrice && product.compareAtPrice > 0) setIsPromo(true);
+        if (product.compareAtPrice && product.compareAtPrice > 0)
+          setIsPromo(true);
 
         if (product.images?.[0]) {
           setImagePreview(product.images[0]);
@@ -89,7 +112,9 @@ export default function EditProductPage() {
   }, [formData, categories]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -124,7 +149,8 @@ export default function EditProductPage() {
           body: fd,
         });
         const uploadData = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(uploadData.message || "Erreur upload image");
+        if (!uploadRes.ok)
+          throw new Error(uploadData.message || "Erreur upload image");
         imagePayload = [uploadData.url];
       } else if (imageMode === "url" && imageUrl.trim()) {
         imagePayload = [imageUrl.trim()];
@@ -143,7 +169,8 @@ export default function EditProductPage() {
           body: JSON.stringify({ name: newCategory.trim() }),
         });
         const catData = await catRes.json();
-        if (!catRes.ok) throw new Error(catData.message || "Erreur création catégorie");
+        if (!catRes.ok)
+          throw new Error(catData.message || "Erreur création catégorie");
         categoryId = catData.data.id;
       }
 
@@ -168,7 +195,8 @@ export default function EditProductPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Erreur mise à jour produit");
+      if (!res.ok)
+        throw new Error(data.message || "Erreur mise à jour produit");
 
       setSuccess(true); // ✅ remplace router.push
     } catch (err: any) {
@@ -178,43 +206,61 @@ export default function EditProductPage() {
     }
   };
 
-  if (loading) return (
-    <Wrapper className="row">
-      <Sidebar />
-      <Container style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Loader />
-      </Container>
-    </Wrapper>
-  );
+  if (loading)
+    return (
+      <Wrapper className="row">
+        <Sidebar />
+        <Container
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Loader />
+        </Container>
+      </Wrapper>
+    );
 
-  if (error && !formData) return (
-    <Wrapper className="row">
-      <Sidebar />
-      <Container>
-        <p style={{ color: "#dc2626" }}>{error}</p>
-      </Container>
-    </Wrapper>
-  );
+  if (error && !formData)
+    return (
+      <Wrapper className="row">
+        <Sidebar />
+        <Container>
+          <p style={{ color: "#dc2626" }}>{error}</p>
+        </Container>
+      </Wrapper>
+    );
 
   if (!formData) return null;
 
-  if (success) return (
-    <Wrapper className="row">
-      <Sidebar />
-      <Container style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <SuccessCard>
-          <SuccessIcon>✅</SuccessIcon>
-          <SuccessTitle>Produit modifié avec succès !</SuccessTitle>
-          <SuccessText>
-            Les modifications ont bien été enregistrées.
-          </SuccessText>
-          <SubmitBtn type="button" onClick={() => router.push(`/admin/products/${params.id}`)}>
-            OK
-          </SubmitBtn>
-        </SuccessCard>
-      </Container>
-    </Wrapper>
-  );
+  if (success)
+    return (
+      <Wrapper className="row">
+        <Sidebar />
+        <Container
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <SuccessCard>
+            <SuccessIcon>✅</SuccessIcon>
+            <SuccessTitle>Produit modifié avec succès !</SuccessTitle>
+            <SuccessText>
+              Les modifications ont bien été enregistrées.
+            </SuccessText>
+            <SubmitBtn
+              type="button"
+              onClick={() => router.push(`/admin/products/${params.id}`)}
+            >
+              OK
+            </SubmitBtn>
+          </SuccessCard>
+        </Container>
+      </Wrapper>
+    );
 
   return (
     <Wrapper className="row">
@@ -228,7 +274,9 @@ export default function EditProductPage() {
 
         <Card onSubmit={handleSubmit}>
           <PageTitle>Modifier le produit</PageTitle>
-          <PageSubtitle>Mettez à jour les informations de votre produit.</PageSubtitle>
+          <PageSubtitle>
+            Mettez à jour les informations de votre produit.
+          </PageSubtitle>
 
           {error && <ErrorBox>{error}</ErrorBox>}
 
@@ -261,8 +309,14 @@ export default function EditProductPage() {
             </Column>
             <Column>
               <PromoHeader>
-                <FieldLabel style={{ marginBottom: 0 }}>Prix promotion</FieldLabel>
-                <Toggle type="button" onClick={() => setIsPromo(!isPromo)} $active={isPromo}>
+                <FieldLabel style={{ marginBottom: 0 }}>
+                  Prix promotion
+                </FieldLabel>
+                <Toggle
+                  type="button"
+                  onClick={() => setIsPromo(!isPromo)}
+                  $active={isPromo}
+                >
                   {isPromo ? "✓ En promo" : "Activer"}
                 </Toggle>
               </PromoHeader>
@@ -309,7 +363,9 @@ export default function EditProductPage() {
                   setNewCategory("");
                 }}
               >
-                {showNewCategory ? "← Choisir une catégorie existante" : "+ Créer une nouvelle catégorie"}
+                {showNewCategory
+                  ? "← Choisir une catégorie existante"
+                  : "+ Créer une nouvelle catégorie"}
               </NewCatLink>
             </Column>
             <Column>
@@ -326,16 +382,28 @@ export default function EditProductPage() {
 
           <SectionLabel>Image produit</SectionLabel>
           <ImageTabs>
-            <ImageTab type="button" $active={imageMode === "file"} onClick={() => setImageMode("file")}>
+            <ImageTab
+              type="button"
+              $active={imageMode === "file"}
+              onClick={() => setImageMode("file")}
+            >
               📁 Depuis mon appareil
             </ImageTab>
-            <ImageTab type="button" $active={imageMode === "url"} onClick={() => setImageMode("url")}>
+            <ImageTab
+              type="button"
+              $active={imageMode === "url"}
+              onClick={() => setImageMode("url")}
+            >
               🔗 Depuis une URL
             </ImageTab>
           </ImageTabs>
 
           {imageMode === "file" ? (
-            <FieldInput type="file" accept="image/*" onChange={handleFileChange} />
+            <FieldInput
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
           ) : (
             <FieldInput
               type="url"

@@ -5,7 +5,7 @@ export const Wrapper = styled.div`
   display: flex;
   min-height: 100vh;
   background: #f8fafc;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 `;
 
 export const Container = styled.div`
@@ -14,6 +14,14 @@ export const Container = styled.div`
   flex-direction: column;
   padding: 48px 52px;
   overflow-x: auto;
+
+  @media (max-width: 1024px) {
+    padding: 40px 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 72px 16px 24px;
+  }
 `;
 
 export const Header = styled.div`
@@ -21,17 +29,27 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 `;
 
 export const TitleBlock = styled.div``;
 
 export const Title = styled.h2`
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 26px;
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.4px;
   margin-bottom: 4px;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
 `;
 
 export const Subtitle = styled.p`
@@ -44,7 +62,7 @@ export const Select = styled.select`
   border-radius: 10px;
   border: 1.5px solid #e2e8f0;
   background: white;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 13px;
   color: #374151;
   outline: none;
@@ -54,6 +72,10 @@ export const Select = styled.select`
   &:focus {
     border-color: #ff6b00;
   }
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
 `;
 
 export const Table = styled.table`
@@ -62,28 +84,53 @@ export const Table = styled.table`
   border-radius: 14px;
   overflow: hidden;
   border-collapse: collapse;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 
-  th, td {
+  th,
+  td {
     padding: 14px 18px;
     text-align: left;
+
+    @media (max-width: 1024px) {
+      padding: 12px 12px;
+    }
   }
 
   th {
     background: #0f172a;
-    color: rgba(255,255,255,0.75);
+    color: rgba(255, 255, 255, 0.75);
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
+    /* Masquer certaines colonnes sur md */
+    &:nth-child(4),
+    &:nth-child(5) {
+      @media (max-width: 900px) {
+        display: none;
+      }
+    }
   }
 
   tbody tr {
     border-bottom: 1px solid #f1f5f9;
     transition: background 0.15s;
 
-    &:last-child { border-bottom: none; }
-    &:hover { background: #fafafa; }
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: #fafafa;
+    }
+
+    /* Masquer certaines colonnes sur md */
+    td:nth-child(4),
+    td:nth-child(5) {
+      @media (max-width: 900px) {
+        display: none;
+      }
+    }
   }
 `;
 
@@ -93,12 +140,21 @@ export const Img = styled.img`
   object-fit: cover;
   border-radius: 10px;
   border: 1px solid #e2e8f0;
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
 `;
 
 export const ProductName = styled.span`
   font-weight: 600;
   font-size: 14px;
   color: #0f172a;
+
+  @media (max-width: 768px) {
+    font-size: 13px;
+  }
 `;
 
 export const CategoryBadge = styled.span`
@@ -115,7 +171,8 @@ export const Status = styled.span<{ $active?: boolean }>`
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
-  background: ${({ $active }) => ($active ? "rgba(255,107,0,0.12)" : "#f1f5f9")};
+  background: ${({ $active }) =>
+    $active ? "rgba(255,107,0,0.12)" : "#f1f5f9"};
   color: ${({ $active }) => ($active ? "#ff6b00" : "#64748b")};
 `;
 
@@ -137,7 +194,9 @@ export const View = styled(Link)`
   font-size: 13px;
   transition: opacity 0.15s;
 
-  &:hover { opacity: 0.85; }
+  &:hover {
+    opacity: 0.85;
+  }
 `;
 
 export const Editing = styled(Link)`
@@ -153,7 +212,9 @@ export const Editing = styled(Link)`
   font-size: 13px;
   transition: opacity 0.15s;
 
-  &:hover { opacity: 0.85; }
+  &:hover {
+    opacity: 0.85;
+  }
 `;
 
 export const Delete = styled.button`
@@ -170,7 +231,9 @@ export const Delete = styled.button`
   cursor: pointer;
   transition: background 0.15s;
 
-  &:hover { background: #fecaca; }
+  &:hover {
+    background: #fecaca;
+  }
 `;
 
 export const FloatingButton = styled.button`
@@ -182,7 +245,7 @@ export const FloatingButton = styled.button`
   border: none;
   background: #ff6b00;
   color: white;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -197,6 +260,13 @@ export const FloatingButton = styled.button`
     background: #e55d00;
     transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(255, 107, 0, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    bottom: 24px;
+    right: 16px;
+    padding: 12px 18px;
+    font-size: 13px;
   }
 `;
 

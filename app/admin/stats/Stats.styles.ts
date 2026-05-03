@@ -21,6 +21,14 @@ export const Container = styled.div`
   flex: 1;
   padding: 48px 52px;
   overflow-x: hidden;
+
+  @media (max-width: 1024px) {
+    padding: 40px 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 72px 16px 24px;
+  }
 `;
 
 export const PageHeader = styled.div`
@@ -28,6 +36,12 @@ export const PageHeader = styled.div`
   align-items: flex-end;
   justify-content: space-between;
   margin-bottom: 36px;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 `;
 
 export const PageTitle = styled.h2`
@@ -37,6 +51,10 @@ export const PageTitle = styled.h2`
   color: #0f172a;
   letter-spacing: -0.4px;
   margin-bottom: 4px;
+
+  @media (max-width: 768px) {
+    font-size: 22px;
+  }
 `;
 
 export const PageSubtitle = styled.p`
@@ -59,14 +77,26 @@ export const PeriodSelect = styled.select`
   &:focus {
     border-color: #ff6b00;
   }
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
 `;
 
-/* ── KPI ── */
 export const KpiGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
 `;
 
 export const KpiCard = styled.div<{ $color: string }>`
@@ -88,6 +118,10 @@ export const KpiCard = styled.div<{ $color: string }>`
     height: 80px;
     border-radius: 50%;
     background: ${({ $color }) => $color}14;
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
   }
 `;
 
@@ -114,6 +148,10 @@ export const KpiValue = styled.p`
   color: #0f172a;
   letter-spacing: -1px;
   margin-bottom: 2px;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 export const KpiLabel = styled.p`
@@ -128,12 +166,15 @@ export const KpiSub = styled.p`
   margin-top: 6px;
 `;
 
-/* ── Sections ── */
 export const SectionGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const Section = styled.div`
@@ -141,6 +182,10 @@ export const Section = styled.div`
   border-radius: 14px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 export const SectionFull = styled(Section)`
@@ -169,7 +214,6 @@ export const SectionBadge = styled.span`
   border-radius: 20px;
 `;
 
-/* ── Product rows ── */
 export const ProductList = styled.div`
   display: flex;
   flex-direction: column;
@@ -259,11 +303,14 @@ export const ProgressFill = styled.div<{ $pct: number; $color: string }>`
   transition: width 0.6s ease;
 `;
 
-/* ── Status badges ── */
 export const StatusGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
 `;
 
 export const StatusItem = styled.div<{ $color: string }>`
@@ -274,6 +321,11 @@ export const StatusItem = styled.div<{ $color: string }>`
   border-radius: 12px;
   padding: 14px 16px;
   text-align: center;
+
+  @media (max-width: 480px) {
+    min-width: 80px;
+    padding: 10px 12px;
+  }
 `;
 
 export const StatusCount = styled.p<{ $color: string }>`
@@ -282,6 +334,10 @@ export const StatusCount = styled.p<{ $color: string }>`
   font-weight: 800;
   color: ${({ $color }) => $color};
   margin-bottom: 2px;
+
+  @media (max-width: 768px) {
+    font-size: 18px;
+  }
 `;
 
 export const StatusName = styled.p`
@@ -291,13 +347,16 @@ export const StatusName = styled.p`
   text-transform: capitalize;
 `;
 
-/* ── Trend ── */
 export const TrendGrid = styled.div`
   display: flex;
   gap: 8px;
   align-items: flex-end;
   height: 80px;
   padding-top: 8px;
+
+  @media (max-width: 480px) {
+    gap: 4px;
+  }
 `;
 
 export const TrendBar = styled.div<{ $pct: number; $color: string }>`
@@ -325,7 +384,6 @@ export const TrendBar = styled.div<{ $pct: number; $color: string }>`
   }
 `;
 
-/* ── Empty / Skeleton ── */
 export const EmptyState = styled.div`
   text-align: center;
   padding: 40px 20px;
