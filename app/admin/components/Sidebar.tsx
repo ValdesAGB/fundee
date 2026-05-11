@@ -43,7 +43,7 @@ export default function Sidebar() {
         {/* ── Brand ── */}
         <Brand>
           <BrandDot />
-          <BrandName>Fundee</BrandName>
+          <BrandName>Fudee</BrandName>
         </Brand>
 
         {/* ── Nav ── */}

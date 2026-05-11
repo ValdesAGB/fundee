@@ -115,7 +115,7 @@ export default function RegisterPage() {
           <SuccessCard>
             <Brand>
               <BrandDot />
-              <BrandName>Fundee</BrandName>
+              <BrandName>Fudee</BrandName>
             </Brand>
             <SuccessIcon>🎉</SuccessIcon>
             <SuccessTitle>Compte créé avec succès !</SuccessTitle>
@@ -134,7 +134,7 @@ export default function RegisterPage() {
           <Form onSubmit={handleSubmit}>
             <Brand>
               <BrandDot />
-              <BrandName>Fundee</BrandName>
+              <BrandName>Fudee</BrandName>
             </Brand>
 
             <Title>Créer votre compte</Title>

@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
         <FormWrap onSubmit={handleSubmit}>
           <Brand>
             <BrandDot />
-            <BrandName>Fundee</BrandName>
+            <BrandName>Fudee</BrandName>
           </Brand>
 
           <IconCircle>

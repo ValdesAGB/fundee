@@ -74,7 +74,7 @@ export default function LoginPage() {
         <FormWrap onSubmit={handleSubmit}>
           <Brand>
             <BrandDot />
-            <BrandName>Fundee</BrandName>
+            <BrandName>Fudee</BrandName>
           </Brand>
 
           <Heading>Bon retour 👋</Heading>
@@ -107,7 +107,7 @@ export default function LoginPage() {
           </Field>
 
           <Row>
-            <Forgot href='/admin/forgot-password'>Mot de passe oublié ?</Forgot>
+            <Forgot href="/admin/forgot-password">Mot de passe oublié ?</Forgot>
           </Row>
 
           <SubmitBtn type="submit" disabled={loading}>
