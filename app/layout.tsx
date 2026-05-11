@@ -13,7 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fundee - L'application qu'il vous faut pour la promotion de vos produits.",
+  title:
+    "Fudee - L'application qu'il vous faut pour la promotion de vos produits.",
   description: "Faites connaitre vos produits.",
 };
 
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-   <html lang="fr">
+    <html lang="fr">
       <head>
         <link
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
