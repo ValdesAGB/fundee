@@ -16,10 +16,7 @@ const dbName = process.env.MONGODB_DB_NAME || 'fundee';
 
 function getClient(): MongoClient {
     if (!globalForMongo.client) {
-        globalForMongo.client = new MongoClient(uri!, {
-            tls: true,
-            tlsAllowInvalidCertificates: true,
-        });
+        globalForMongo.client = new MongoClient(uri!);
     }
     return globalForMongo.client;
 }
