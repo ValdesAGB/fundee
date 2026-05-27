@@ -121,7 +121,10 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
             initFedaPay();
             
             // Get full user profile for FedaPay customer details
-            const userProfile = await db.collection('user').findOne({ id: user.userId });
+            const userProfile = await db.collection('user').findOne(
+                { _id: new ObjectId(user.userId) },
+                { projection: { firstName: 1, lastName: 1, phone: 1, email: 1 } }
+            );
 
             const transaction = await Transaction.create({
                 description: `Payment for Order ${orderNumber}`,
