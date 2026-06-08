@@ -56,10 +56,14 @@ export async function GET(
                     pipeline: [
                         {
                             $match: {
-                                $expr: { $eq: ['$productId', '$$pid'] },
-                                isActive: true,
-                                startDate: { $lte: new Date() },
-                                endDate: { $gte: new Date() }
+                                $expr: {
+                                    $and: [
+                                        { $in: ['$$pid', '$productIds'] },
+                                        { $eq: ['$isActive', true] },
+                                        { $lte: ['$startDate', new Date()] },
+                                        { $gte: ['$endDate', new Date()] }
+                                    ]
+                                }
                             }
                         },
                         {
@@ -117,7 +121,39 @@ export async function GET(
                 $addFields: {
                     id: { $toString: '$_id' },
                     averageRating: { $avg: '$allReviews.rating' },
-                    reviewCount: { $size: '$allReviews' }
+                    reviewCount: { $size: '$allReviews' },
+                    activePromotion: { $arrayElemAt: ['$promotions', 0] },
+                    promotionalPrice: {
+                        $let: {
+                            vars: {
+                                promo: { $arrayElemAt: ['$promotions', 0] }
+                            },
+                            in: {
+                                $cond: {
+                                    if: { $ne: ['$$promo', null] },
+                                    then: {
+                                        $cond: {
+                                            if: { $ne: ['$$promo.discountPercent', null] },
+                                            then: {
+                                                $round: [
+                                                    { $multiply: ['$price', { $subtract: [1, { $divide: ['$$promo.discountPercent', 100] }] }] },
+                                                    0
+                                                ]
+                                            },
+                                            else: {
+                                                $cond: {
+                                                    if: { $ne: ['$$promo.discountAmount', null] },
+                                                    then: { $max: [{ $subtract: ['$price', '$$promo.discountAmount'] }, 0] },
+                                                    else: '$price'
+                                                }
+                                            }
+                                        }
+                                    },
+                                    else: null
+                                }
+                            }
+                        }
+                    }
                 }
             },
             { $project: { _id: 0, allReviews: 0 } }
@@ -131,6 +167,8 @@ export async function GET(
 
         // Handle possible null average rating
         product.averageRating = product.averageRating || 0;
+        product.promotionalPrice = product.promotionalPrice || null;
+        product.activePromotion = product.activePromotion || null;
 
         return successResponse(product);
     } catch (error) {

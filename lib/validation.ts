@@ -65,6 +65,7 @@ export const createProductSchema = z.object({
     .default(0),
   categoryId: z.string().min(1, "La catégorie est requise"),
   images: z.array(z.string()).optional(),
+  isAntiGaspillage: z.boolean().optional().default(false),
 });
 
 export const updateProductSchema = z.object({
@@ -76,6 +77,7 @@ export const updateProductSchema = z.object({
   categoryId: z.string().optional(),
   images: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
+  isAntiGaspillage: z.boolean().optional(),
 });
 
 export const productFilterSchema = z.object({

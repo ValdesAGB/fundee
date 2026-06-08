@@ -94,13 +94,76 @@ export async function GET(request: NextRequest) {
                             }
                         },
                         {
+                            $lookup: {
+                                from: 'promotion',
+                                let: { pid: { $toString: '$_id' } },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $and: [
+                                                    { $in: ['$$pid', '$productIds'] },
+                                                    { $eq: ['$isActive', true] },
+                                                    { $lte: ['$startDate', new Date()] },
+                                                    { $gte: ['$endDate', new Date()] }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        $project: {
+                                            _id: 0,
+                                            id: { $toString: '$_id' },
+                                            title: 1,
+                                            discountPercent: 1,
+                                            discountAmount: 1,
+                                            endDate: 1
+                                        }
+                                    }
+                                ],
+                                as: 'activePromotions'
+                            }
+                        },
+                        {
                             $addFields: {
                                 id: { $toString: '$_id' },
                                 reviewCount: { $size: '$reviews' },
-                                averageRating: { $avg: '$reviews.rating' }
+                                averageRating: { $avg: '$reviews.rating' },
+                                activePromotion: { $arrayElemAt: ['$activePromotions', 0] },
+                                promotionalPrice: {
+                                    $let: {
+                                        vars: {
+                                            promo: { $arrayElemAt: ['$activePromotions', 0] }
+                                        },
+                                        in: {
+                                            $cond: {
+                                                if: { $ne: ['$$promo', null] },
+                                                then: {
+                                                    $cond: {
+                                                        if: { $ne: ['$$promo.discountPercent', null] },
+                                                        then: {
+                                                            $round: [
+                                                                { $multiply: ['$price', { $subtract: [1, { $divide: ['$$promo.discountPercent', 100] }] }] },
+                                                                0
+                                                            ]
+                                                        },
+                                                        else: {
+                                                            $cond: {
+                                                                if: { $ne: ['$$promo.discountAmount', null] },
+                                                                then: { $max: [{ $subtract: ['$price', '$$promo.discountAmount'] }, 0] },
+                                                                else: '$price'
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                else: null
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         },
-                        { $project: { _id: 0, reviews: 0 } }
+                        { $project: { _id: 0, reviews: 0, activePromotions: 0 } }
                     ]
                 }
             }
@@ -113,7 +176,9 @@ export async function GET(request: NextRequest) {
         const total = facetResult.metadata[0]?.total || 0;
         const productsWithRatings = facetResult.data.map((p: any) => ({
             ...p,
-            averageRating: p.averageRating || 0
+            averageRating: p.averageRating || 0,
+            promotionalPrice: p.promotionalPrice || null,
+            activePromotion: p.activePromotion || null
         }));
 
         return successResponse({

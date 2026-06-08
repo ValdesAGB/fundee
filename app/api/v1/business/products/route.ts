@@ -84,7 +84,7 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
             return Errors.validationError(validation.error);
         }
 
-        const { name, description, price, compareAtPrice, stock, categoryId, images } = validation.data;
+        const { name, description, price, compareAtPrice, stock, categoryId, images, isAntiGaspillage } = validation.data;
 
         const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
         const uniqueSuffix = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -100,6 +100,7 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
             categoryId,
             businessId: user.userId,
             images: images || [],
+            isAntiGaspillage: isAntiGaspillage ?? false,
             isActive: true,
             viewCount: 0,
             createdAt: new Date(),

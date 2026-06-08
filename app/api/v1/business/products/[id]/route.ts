@@ -31,7 +31,16 @@ export const GET = requireAuth(async (
                     from: 'promotion',
                     let: { pid: { $toString: '$_id' } },
                     pipeline: [
-                        { $match: { $expr: { $eq: ['$productId', '$$pid'] } } }
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $in: ['$$pid', '$productIds'] },
+                                        { $eq: ['$isActive', true] }
+                                    ]
+                                }
+                            }
+                        }
                     ],
                     as: 'promotions'
                 }
