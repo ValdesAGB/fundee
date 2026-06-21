@@ -164,7 +164,7 @@ export const PromoHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 `;
 
 export const Toggle = styled.button<{ $active: boolean }>`
@@ -173,8 +173,8 @@ export const Toggle = styled.button<{ $active: boolean }>`
   border-radius: 20px;
   border: none;
   cursor: pointer;
-  background: ${({ $active }) => ($active ? "#ff6b00" : "#f1f5f9")};
-  color: ${({ $active }) => ($active ? "white" : "#64748b")};
+  background: ${({ $active }) => (!$active ? "#ff6b00" : "#f1f5f9")};
+  color: ${({ $active }) => (!$active ? "white" : "#64748b")};
   font-family: "Poppins", sans-serif;
   font-weight: 600;
   transition: 0.2s;
@@ -314,4 +314,16 @@ export const SuccessText = styled.p`
   font-size: 14px;
   color: #6b7280;
   line-height: 1.7;
+`;
+
+export const AGBadge = styled.div`
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f0fdf4;
+  border: 1.5px dashed #86efac;
+  color: #16a34a;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
 `;

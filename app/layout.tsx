@@ -33,6 +33,11 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
 
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=JetBrains+Mono:wght@500;600&display=swap"
+          rel="stylesheet"
+        />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

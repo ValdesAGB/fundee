@@ -5,12 +5,28 @@ import { useState, useEffect } from "react";
 import Sidebar from "@/app/admin/components/Sidebar";
 import { Loader } from "../../components/dots/Loader";
 import {
-  Wrapper, Container, BackLink, Card,
-  ImageBlock, ProductImage, Content,
-  CategoryBadge, Title, Description,
-  InfoGrid, InfoCard, InfoLabel, InfoValue,
-  PromoStatus, DateRow, DateItem, DateLabel, DateValue,
-  Actions, EditButton, DeleteButton,
+  Wrapper,
+  Container,
+  BackLink,
+  Card,
+  ImageBlock,
+  ProductImage,
+  Content,
+  CategoryBadge,
+  Title,
+  Description,
+  InfoGrid,
+  InfoCard,
+  InfoLabel,
+  InfoValue,
+  PromoStatus,
+  DateRow,
+  DateItem,
+  DateLabel,
+  DateValue,
+  Actions,
+  EditButton,
+  DeleteButton,
 } from "./DetailsProduct.styled";
 
 export default function ProductDetailPage() {
@@ -29,7 +45,8 @@ export default function ProductDetailPage() {
           credentials: "include",
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || "Erreur récupération produit");
+        if (!res.ok)
+          throw new Error(data.message || "Erreur récupération produit");
         setProduct(data.data);
       } catch (err: any) {
         setError(err.message);
@@ -42,7 +59,9 @@ export default function ProductDetailPage() {
 
   // 🔌 Suppression
   const handleDelete = async () => {
-    const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce produit ?");
+    const confirmDelete = confirm(
+      "Êtes-vous sûr de vouloir supprimer ce produit ?",
+    );
     if (!confirmDelete) return;
     try {
       const res = await fetch(`/api/v1/business/products/${params.id}`, {
@@ -70,25 +89,33 @@ export default function ProductDetailPage() {
     return `${day}/${month}/${year} - ${hours}:${minutes}`;
   };
 
-  if (loading) return (
-    <Wrapper className="row">
-      <Sidebar />
-      <Container style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Loader />
-      </Container>
-    </Wrapper>
-  );
+  if (loading)
+    return (
+      <Wrapper className="row">
+        <Sidebar />
+        <Container
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Loader />
+        </Container>
+      </Wrapper>
+    );
 
-  if (error || !product) return (
-    <Wrapper className="row">
-      <Sidebar />
-      <Container>
-        <p style={{ color: "#dc2626", fontFamily: "Poppins, sans-serif" }}>
-          {error || "Produit introuvable"}
-        </p>
-      </Container>
-    </Wrapper>
-  );
+  if (error || !product)
+    return (
+      <Wrapper className="row">
+        <Sidebar />
+        <Container>
+          <p style={{ color: "#dc2626", fontFamily: "Poppins, sans-serif" }}>
+            {error || "Produit introuvable"}
+          </p>
+        </Container>
+      </Wrapper>
+    );
 
   return (
     <Wrapper className="row">
@@ -136,10 +163,10 @@ export default function ProductDetailPage() {
               </InfoCard>
 
               <InfoCard>
-                <InfoLabel>Promotion</InfoLabel>
+                <InfoLabel>Statut</InfoLabel>
                 <InfoValue>
                   <PromoStatus $active={!!product.compareAtPrice}>
-                    {product.compareAtPrice ? "En promo" : "Normal"}
+                    {product.compareAtPrice ? "En promo" : "Anti-Gaspi (A-G)"}
                   </PromoStatus>
                 </InfoValue>
               </InfoCard>
