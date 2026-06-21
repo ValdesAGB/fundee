@@ -1,7 +1,13 @@
 import { Actions } from "@/app/NotFound.styles";
 import { Delete, Editing, View } from "../products/Products.styled";
 
-export default function DashboardActionsBtn({ product, handleDelete }) {
+export default function DashboardActionsBtn({
+  product,
+  handleDelete,
+}: {
+  product: any;
+  handleDelete: any;
+}) {
   return (
     <>
       <Actions>
