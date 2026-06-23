@@ -1,8 +1,6 @@
-// middleware.ts (racine)
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_ROUTES = [
-  "/admin",
   "/admin/login",
   "/admin/register",
   "/admin/forgot-password",
@@ -11,6 +9,9 @@ const PUBLIC_ROUTES = [
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // ✅ Page d'accueil /admin accessible sans token
+  if (pathname === "/admin") return NextResponse.next();
 
   const isPublic = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
   const token =
