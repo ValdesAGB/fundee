@@ -1,35 +1,63 @@
-import 'dotenv/config';
-import { MongoClient, Db } from 'mongodb';
+import { MongoClient, Db } from "mongodb";
 
 const uri = process.env.DATABASE_URL;
 
 if (!uri) {
-    throw new Error('Please define the DATABASE_URL environment variable inside .env');
+  throw new Error("Please define the DATABASE_URL environment variable");
 }
+
+const dbName = process.env.MONGODB_DB_NAME || "fundee";
 
 const globalForMongo = globalThis as unknown as {
-    client: MongoClient | undefined;
-    db: Db | undefined;
+  client: MongoClient | undefined;
+  db: Db | undefined;
 };
 
-const dbName = process.env.MONGODB_DB_NAME || 'fundee';
-
-function getClient(): MongoClient {
-    if (!globalForMongo.client) {
-        globalForMongo.client = new MongoClient(uri!, {
-            tls: true,
-            tlsAllowInvalidCertificates: true,
-        });
+async function connectToDatabase(): Promise<Db> {
+  if (globalForMongo.db && globalForMongo.client) {
+    try {
+      // ✅ Vérifie que la connexion est toujours active
+      await globalForMongo.client.db("admin").command({ ping: 1 });
+      return globalForMongo.db;
+    } catch {
+      // Connexion fermée — on réinitialise
+      globalForMongo.client = undefined;
+      globalForMongo.db = undefined;
     }
-    return globalForMongo.client;
+  }
+
+  const client = new MongoClient(uri!, {
+    tls: true,
+    tlsAllowInvalidCertificates: true,
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 30000,
+    maxPoolSize: 10,
+    minPoolSize: 1,
+  });
+
+  await client.connect();
+
+  globalForMongo.client = client;
+  globalForMongo.db = client.db(dbName);
+
+  return globalForMongo.db;
 }
 
-export const client = getClient();
+// ✅ Proxy qui reconnecte automatiquement si nécessaire
+export const db = new Proxy({} as Db, {
+  get(_, prop: string) {
+    return async (...args: any[]) => {
+      const database = await connectToDatabase();
+      const collection = (database as any)[prop];
+      if (typeof collection === "function") {
+        return collection.apply(database, args);
+      }
+      return collection;
+    };
+  },
+});
 
-// ✅ Connexion explicite au démarrage
-if (!globalForMongo.db) {
-    client.connect().catch(console.error);
-    globalForMongo.db = client.db(dbName);
+export async function getDb(): Promise<Db> {
+  return connectToDatabase();
 }
-
-export const db = globalForMongo.db;
