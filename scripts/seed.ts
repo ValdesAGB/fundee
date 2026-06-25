@@ -1,4 +1,4 @@
-import { db, client } from "../lib/db";
+import { db } from "../lib/db";
 import { hashPassword } from "../lib/auth";
 
 async function main() {
@@ -273,5 +273,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await client.close();
+    process.exit(0);
   });
