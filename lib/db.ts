@@ -1,32 +1,17 @@
-import { MongoClient, Db } from "mongodb";
+import 'dotenv/config';
+import { MongoClient, Db } from 'mongodb';
 
 const uri = process.env.DATABASE_URL;
+const dbName = process.env.MONGODB_DB_NAME || 'fundee';
 
-if (!uri) {
-  throw new Error("Please define the DATABASE_URL environment variable");
-}
+let clientPromise: Promise<MongoClient> | null = null;
+let dbPromise: Promise<Db> | null = null;
 
-const dbName = process.env.MONGODB_DB_NAME || "fundee";
-
-const globalForMongo = globalThis as unknown as {
-  client: MongoClient | undefined;
-  db: Db | undefined;
-};
-
-async function connectToDatabase(): Promise<Db> {
-  if (globalForMongo.db && globalForMongo.client) {
-    try {
-      // ✅ Vérifie que la connexion est toujours active
-      await globalForMongo.client.db("admin").command({ ping: 1 });
-      return globalForMongo.db;
-    } catch {
-      // Connexion fermée — on réinitialise
-      globalForMongo.client = undefined;
-      globalForMongo.db = undefined;
-    }
+function createClient(): Promise<MongoClient> {
+  if (!uri) {
+    throw new Error('Please define the DATABASE_URL environment variable inside .env');
   }
-
-  const client = new MongoClient(uri!, {
+  const client = new MongoClient(uri, {
     tls: true,
     tlsAllowInvalidCertificates: true,
     serverSelectionTimeoutMS: 10000,
@@ -35,29 +20,61 @@ async function connectToDatabase(): Promise<Db> {
     maxPoolSize: 10,
     minPoolSize: 1,
   });
-
-  await client.connect();
-
-  globalForMongo.client = client;
-  globalForMongo.db = client.db(dbName);
-
-  return globalForMongo.db;
+  return client.connect();
 }
 
-// ✅ Proxy qui reconnecte automatiquement si nécessaire
-export const db = new Proxy({} as Db, {
-  get(_, prop: string) {
-    return async (...args: any[]) => {
-      const database = await connectToDatabase();
-      const collection = (database as any)[prop];
-      if (typeof collection === "function") {
-        return collection.apply(database, args);
-      }
-      return collection;
-    };
-  },
-});
+function getClientPromise(): Promise<MongoClient> {
+  if (!clientPromise) {
+    clientPromise = createClient();
+  }
+  return clientPromise;
+}
+
+function getDbPromise(): Promise<Db> {
+  if (!dbPromise) {
+    dbPromise = getClientPromise().then(client => client.db(dbName));
+  }
+  return dbPromise;
+}
 
 export async function getDb(): Promise<Db> {
-  return connectToDatabase();
+  return getDbPromise();
 }
+
+export async function getClient(): Promise<MongoClient> {
+  return getClientPromise();
+}
+
+export async function closeConnection(): Promise<void> {
+  const client = await getClientPromise();
+  return client.close();
+}
+
+// Synchronous proxy that correctly binds methods to the actual Db instance
+export const db = new Proxy({} as Db, {
+  get(_target, prop) {
+    if (prop === 'then' || prop === 'toJSON') return undefined;
+    return async (...args: any[]) => {
+      const db = await getDbPromise();
+      const value = Reflect.get(db, prop);
+      if (typeof value === 'function') {
+        return value.bind(db)(...args);
+      }
+      return value;
+    };
+  }
+});
+
+export const client = new Proxy({} as MongoClient, {
+  get(_target, prop) {
+    if (prop === 'then' || prop === 'toJSON') return undefined;
+    return async (...args: any[]) => {
+      const client = await getClientPromise();
+      const value = Reflect.get(client, prop);
+      if (typeof value === 'function') {
+        return value.bind(client)(...args);
+      }
+      return value;
+    };
+  }
+});
