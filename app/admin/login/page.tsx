@@ -28,6 +28,8 @@ import {
   Quote,
   Accent,
 } from "./LoginPage.styles";
+import App from "next/app";
+import AppName from "../components/AppName";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -74,7 +76,9 @@ export default function LoginPage() {
         <FormWrap onSubmit={handleSubmit}>
           <Brand>
             <BrandDot />
-            <BrandName>Fudee</BrandName>
+            <BrandName>
+              <AppName />
+            </BrandName>
           </Brand>
 
           <Heading>Bon retour 👋</Heading>

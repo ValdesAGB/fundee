@@ -6,10 +6,28 @@ import Sidebar from "@/app/admin/components/Sidebar";
 import { Loader } from "../components/dots/Loader";
 import FirstProduct from "../components/FirstProduct";
 import {
-  Wrapper, Container, Header, TitleBlock, Title, Subtitle,
-  Select, Table, Img, ProductName, CategoryBadge, Status,
-  Actions, View, Editing, Delete, FloatingButton, EmptyCell,
+  Wrapper,
+  Container,
+  Header,
+  TitleBlock,
+  Title,
+  Subtitle,
+  Select,
+  Table,
+  Img,
+  ProductName,
+  CategoryBadge,
+  Status,
+  Actions,
+  View,
+  Editing,
+  Delete,
+  FloatingButton,
+  EmptyCell,
 } from "./Products.styled";
+import DashboardTableHead from "../components/DashboardTableHead";
+import NewProductBtn from "../components/NewProductBtn";
+import DashboardActionsBtn from "../components/DashboardActionsBtn";
 
 interface Product {
   id: string;
@@ -20,6 +38,7 @@ interface Product {
   categoryId?: string;
   category?: { name: string };
   images?: string[];
+  createdAt?: string;
 }
 
 export default function ProductsPage() {
@@ -27,6 +46,15 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState<string[]>([]);
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+
+  const formatDate = (date?: string) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -45,8 +73,8 @@ export default function ProductsPage() {
           new Set(
             list
               .map((p) => p.category?.name || p.categoryId)
-              .filter(Boolean) as string[]
-          )
+              .filter(Boolean) as string[],
+          ),
         );
         setCategories(uniqueCategories);
       } catch (err) {
@@ -81,18 +109,21 @@ export default function ProductsPage() {
       : products.filter(
           (p) =>
             p.categoryId === categoryFilter ||
-            p.category?.name?.toLowerCase() === categoryFilter.toLowerCase()
+            p.category?.name?.toLowerCase() === categoryFilter.toLowerCase(),
         );
 
   return (
-    <Wrapper className='row'>
+    <Wrapper className="row">
       <Sidebar />
 
       <Container>
         <Header>
           <TitleBlock>
             <Title>Tous vos produits</Title>
-            <Subtitle>{products.length} produit{products.length !== 1 ? "s" : ""} au total</Subtitle>
+            <Subtitle>
+              {products.length} produit{products.length !== 1 ? "s" : ""} au
+              total
+            </Subtitle>
           </TitleBlock>
 
           <Select onChange={(e) => setCategoryFilter(e.target.value)}>
@@ -109,23 +140,12 @@ export default function ProductsPage() {
           <Loader />
         ) : (
           <Table>
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Nom</th>
-                <th>Catégorie</th>
-                <th>Prix</th>
-                <th>Prix Promo</th>
-                <th>Stock</th>
-                <th>Statut</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+            <DashboardTableHead />
 
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <EmptyCell colSpan={8}>
+                  <EmptyCell colSpan={9}>
                     <FirstProduct />
                   </EmptyCell>
                 </tr>
@@ -134,47 +154,39 @@ export default function ProductsPage() {
                   <tr key={product.id}>
                     <td>
                       <Img
-                        src={product.images?.[0] || "https://via.placeholder.com/52"}
+                        src={
+                          product.images?.[0] ||
+                          "https://via.placeholder.com/52"
+                        }
                         alt={product.name}
                       />
                     </td>
-
                     <td>
                       <ProductName>{product.name}</ProductName>
                     </td>
-
                     <td>
                       <CategoryBadge>
                         {product.category?.name || product.categoryId || "-"}
                       </CategoryBadge>
                     </td>
-
                     <td>${product.price}</td>
-
                     <td>
-                      {product.compareAtPrice ? `$${product.compareAtPrice}` : "-"}
+                      {product.compareAtPrice
+                        ? `$${product.compareAtPrice}`
+                        : "-"}
                     </td>
-
                     <td>{product.stock}</td>
-
                     <td>
                       <Status $active={!!product.compareAtPrice}>
-                        {product.compareAtPrice ? "Promo" : "Normal"}
+                        {product.compareAtPrice ? "Promo" : "A-G"}
                       </Status>
                     </td>
-
+                    <td>{formatDate(product.createdAt)}</td>
                     <td>
-                      <Actions>
-                        <View href={`/admin/products/${product.id}`}>
-                          <i className="bi bi-eye" />
-                        </View>
-                        <Editing href={`/admin/products/edit/${product.id}`}>
-                          <i className="bi bi-pencil" />
-                        </Editing>
-                        <Delete onClick={() => handleDelete(product.id)}>
-                          <i className="bi bi-trash3" />
-                        </Delete>
-                      </Actions>
+                      <DashboardActionsBtn
+                        product={product}
+                        handleDelete={handleDelete}
+                      />
                     </td>
                   </tr>
                 ))
@@ -183,12 +195,7 @@ export default function ProductsPage() {
           </Table>
         )}
 
-        <Link href="/admin/products/add-product">
-          <FloatingButton>
-            <i className="bi bi-plus-lg" />
-            Nouveau Produit
-          </FloatingButton>
-        </Link>
+        <NewProductBtn />
       </Container>
     </Wrapper>
   );

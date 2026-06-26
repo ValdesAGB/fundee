@@ -6,12 +6,31 @@ import Sidebar from "@/app/admin/components/Sidebar";
 import { Loader } from "../../components/dots/Loader";
 import { handleAddProduct } from "./handleSubmit";
 import {
-  Wrapper, Container, Card, PageTitle, PageSubtitle,
-  FieldLabel, FieldInput, FieldTextarea, FieldSelect,
-  Row, Column, PromoHeader, Toggle, NewCatLink,
-  ImageTabs, ImageTab, ImagePreview, SubmitBtn,
-  ErrorBox, SectionLabel, SuccessCard, SuccessIcon,
-  SuccessTitle, SuccessText,
+  Wrapper,
+  Container,
+  Card,
+  PageTitle,
+  PageSubtitle,
+  FieldLabel,
+  FieldInput,
+  FieldTextarea,
+  FieldSelect,
+  Row,
+  Column,
+  PromoHeader,
+  Toggle,
+  NewCatLink,
+  ImageTabs,
+  ImageTab,
+  ImagePreview,
+  SubmitBtn,
+  ErrorBox,
+  SectionLabel,
+  SuccessCard,
+  SuccessIcon,
+  SuccessTitle,
+  SuccessText,
+  AGBadge,
 } from "./AddProduct.styles";
 
 interface Category {
@@ -47,7 +66,9 @@ export default function AddProductPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/v1/categories", { credentials: "include" });
+        const res = await fetch("/api/v1/categories", {
+          credentials: "include",
+        });
         const data = await res.json();
         if (res.ok) setCategories(data.data || []);
       } catch {}
@@ -56,7 +77,9 @@ export default function AddProductPage() {
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -76,8 +99,16 @@ export default function AddProductPage() {
 
   const handleSubmit = (e: React.FormEvent) =>
     handleAddProduct(e, {
-      formData, isPromo, imageMode, imageFile, imageUrl,
-      showNewCategory, newCategory, setError, setLoading, router,
+      formData,
+      isPromo,
+      imageMode,
+      imageFile,
+      imageUrl,
+      showNewCategory,
+      newCategory,
+      setError,
+      setLoading,
+      router,
       onSuccess: () => setSuccess(true),
     });
 
@@ -85,14 +116,24 @@ export default function AddProductPage() {
     return (
       <Wrapper className="row">
         <Sidebar />
-        <Container style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Container
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <SuccessCard>
             <SuccessIcon>✅</SuccessIcon>
             <SuccessTitle>Produit ajouté avec succès !</SuccessTitle>
             <SuccessText>
-              Votre produit a été créé et est maintenant disponible dans votre catalogue.
+              Votre produit a été créé et est maintenant disponible dans votre
+              catalogue.
             </SuccessText>
-            <SubmitBtn type="button" onClick={() => router.push("/admin/products")}>
+            <SubmitBtn
+              type="button"
+              onClick={() => router.push("/admin/products")}
+            >
               OK
             </SubmitBtn>
           </SuccessCard>
@@ -107,7 +148,9 @@ export default function AddProductPage() {
       <Container>
         <Card onSubmit={handleSubmit}>
           <PageTitle>Ajouter un produit</PageTitle>
-          <PageSubtitle>Remplissez les informations de votre nouveau produit.</PageSubtitle>
+          <PageSubtitle>
+            Remplissez les informations de votre nouveau produit.
+          </PageSubtitle>
 
           {error && <ErrorBox>{error}</ErrorBox>}
 
@@ -143,24 +186,27 @@ export default function AddProductPage() {
             </Column>
             <Column>
               <PromoHeader>
-                <FieldLabel style={{ marginBottom: 0 }}>Prix promotion</FieldLabel>
+                <FieldLabel>Statut : {isPromo && "En promotion"}</FieldLabel>
                 <Toggle
                   type="button"
                   onClick={() => setIsPromo(!isPromo)}
                   $active={isPromo}
                 >
-                  {isPromo ? "✓ En promo" : "Activer"}
+                  {isPromo ? "Désactiver" : "Activer"}
                 </Toggle>
               </PromoHeader>
-              <FieldInput
-                type="number"
-                name="compareAtPrice"
-                value={formData.compareAtPrice}
-                onChange={handleChange}
-                disabled={!isPromo}
-                placeholder={isPromo ? "Prix barré" : "—"}
-                style={{ opacity: isPromo ? 1 : 0.4 }}
-              />
+
+              {isPromo ? (
+                <FieldInput
+                  type="number"
+                  name="compareAtPrice"
+                  value={formData.compareAtPrice}
+                  onChange={handleChange}
+                  placeholder="Prix barré"
+                />
+              ) : (
+                <AGBadge>Anti-gaspi (A-G)</AGBadge>
+              )}
             </Column>
           </Row>
 
@@ -234,7 +280,11 @@ export default function AddProductPage() {
           </ImageTabs>
 
           {imageMode === "file" ? (
-            <FieldInput type="file" accept="image/*" onChange={handleFileChange} />
+            <FieldInput
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
           ) : (
             <FieldInput
               type="url"

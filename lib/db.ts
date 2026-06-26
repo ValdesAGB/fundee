@@ -11,7 +11,15 @@ function createClient(): Promise<MongoClient> {
   if (!uri) {
     throw new Error('Please define the DATABASE_URL environment variable inside .env');
   }
-  const client = new MongoClient(uri);
+  const client = new MongoClient(uri, {
+    tls: true,
+    tlsAllowInvalidCertificates: true,
+    serverSelectionTimeoutMS: 10000,
+    connectTimeoutMS: 10000,
+    socketTimeoutMS: 30000,
+    maxPoolSize: 10,
+    minPoolSize: 1,
+  });
   return client.connect();
 }
 

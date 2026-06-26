@@ -31,6 +31,7 @@ import {
   SuccessIcon,
   SuccessTitle,
   SuccessText,
+  AGBadge,
 } from "./Edit.styles";
 
 interface Category {
@@ -309,26 +310,27 @@ export default function EditProductPage() {
             </Column>
             <Column>
               <PromoHeader>
-                <FieldLabel style={{ marginBottom: 0 }}>
-                  Prix promotion
-                </FieldLabel>
+                <FieldLabel>Statut : {isPromo && "En promotion"}</FieldLabel>
                 <Toggle
                   type="button"
                   onClick={() => setIsPromo(!isPromo)}
                   $active={isPromo}
                 >
-                  {isPromo ? "✓ En promo" : "Activer"}
+                  {isPromo ? "Désactiver" : "Activer"}
                 </Toggle>
               </PromoHeader>
-              <FieldInput
-                type="number"
-                name="compareAtPrice"
-                value={formData.compareAtPrice || ""}
-                onChange={handleChange}
-                disabled={!isPromo}
-                placeholder={isPromo ? "Prix barré" : "—"}
-                style={{ opacity: isPromo ? 1 : 0.4 }}
-              />
+
+              {isPromo ? (
+                <FieldInput
+                  type="number"
+                  name="compareAtPrice"
+                  value={formData.compareAtPrice}
+                  onChange={handleChange}
+                  placeholder="Prix barré"
+                />
+              ) : (
+                <AGBadge>Anti-gaspi (A-G)</AGBadge>
+              )}
             </Column>
           </Row>
 
