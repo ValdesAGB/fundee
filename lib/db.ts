@@ -11,15 +11,27 @@ function createClient(): Promise<MongoClient> {
   if (!uri) {
     throw new Error('Please define the DATABASE_URL environment variable inside .env');
   }
-  const client = new MongoClient(uri, {
-    tls: true,
-    tlsAllowInvalidCertificates: true,
+
+  // Determine if TLS should be used
+  // MongoDB Atlas (mongodb+srv://) requires TLS
+  // Local MongoDB (mongodb://localhost) typically doesn't use TLS
+  const isAtlas = uri.startsWith('mongodb+srv://');
+  const useTls = process.env.MONGODB_TLS === 'true' || isAtlas;
+
+  const clientOptions: any = {
     serverSelectionTimeoutMS: 10000,
     connectTimeoutMS: 10000,
     socketTimeoutMS: 30000,
     maxPoolSize: 10,
     minPoolSize: 1,
-  });
+  };
+
+  if (useTls) {
+    clientOptions.tls = true;
+    clientOptions.tlsAllowInvalidCertificates = process.env.MONGODB_TLS_ALLOW_INVALID === 'true';
+  }
+
+  const client = new MongoClient(uri, clientOptions);
   return client.connect();
 }
 
