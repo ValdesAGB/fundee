@@ -1,63 +1,88 @@
+import "dotenv/config";
 import { MongoClient, Db } from "mongodb";
 
 const uri = process.env.DATABASE_URL;
-
-if (!uri) {
-  throw new Error("Please define the DATABASE_URL environment variable");
-}
-
 const dbName = process.env.MONGODB_DB_NAME || "fundee";
 
 const globalForMongo = globalThis as unknown as {
-  client: MongoClient | undefined;
-  db: Db | undefined;
+  _mongoClient?: MongoClient;
+  _mongoDb?: Db;
 };
 
-async function connectToDatabase(): Promise<Db> {
-  if (globalForMongo.db && globalForMongo.client) {
-    try {
-      // ✅ Vérifie que la connexion est toujours active
-      await globalForMongo.client.db("admin").command({ ping: 1 });
-      return globalForMongo.db;
-    } catch {
-      // Connexion fermée — on réinitialise
-      globalForMongo.client = undefined;
-      globalForMongo.db = undefined;
+function getDbInstance(): Db {
+  if (!globalForMongo._mongoDb) {
+    if (!uri) {
+      throw new Error(
+        "Please define the DATABASE_URL environment variable inside .env",
+      );
     }
+
+    const isAtlas = uri.startsWith("mongodb+srv://");
+    const useTls = process.env.MONGODB_TLS === "true" || isAtlas;
+
+    const clientOptions: any = {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 30000,
+      maxPoolSize: 10,
+      minPoolSize: 1,
+    };
+
+    if (useTls) {
+      clientOptions.tls = true;
+      clientOptions.tlsAllowInvalidCertificates =
+        process.env.MONGODB_TLS_ALLOW_INVALID === "true";
+    }
+
+    const client = new MongoClient(uri, clientOptions);
+    client.connect().catch(console.error);
+
+    globalForMongo._mongoClient = client;
+    globalForMongo._mongoDb = client.db(dbName);
   }
-
-  const client = new MongoClient(uri!, {
-    tls: true,
-    tlsAllowInvalidCertificates: true,
-    serverSelectionTimeoutMS: 10000,
-    connectTimeoutMS: 10000,
-    socketTimeoutMS: 30000,
-    maxPoolSize: 10,
-    minPoolSize: 1,
-  });
-
-  await client.connect();
-
-  globalForMongo.client = client;
-  globalForMongo.db = client.db(dbName);
-
-  return globalForMongo.db;
+  return globalForMongo._mongoDb;
 }
 
-// ✅ Proxy qui reconnecte automatiquement si nécessaire
+export async function getDb(): Promise<Db> {
+  return getDbInstance();
+}
+
+export async function getClient(): Promise<MongoClient> {
+  getDbInstance();
+  return globalForMongo._mongoClient!;
+}
+
+export async function closeConnection(): Promise<void> {
+  if (globalForMongo._mongoClient) {
+    await globalForMongo._mongoClient.close();
+    delete globalForMongo._mongoClient;
+    delete globalForMongo._mongoDb;
+  }
+}
+
+// Synchronous proxy for the Db instance to support lazy module evaluation (important for Next.js builds)
 export const db = new Proxy({} as Db, {
-  get(_, prop: string) {
-    return async (...args: any[]) => {
-      const database = await connectToDatabase();
-      const collection = (database as any)[prop];
-      if (typeof collection === "function") {
-        return collection.apply(database, args);
-      }
-      return collection;
-    };
+  get(_target, prop) {
+    if (prop === "then" || prop === "toJSON") return undefined;
+    const actualDb = getDbInstance();
+    const value = Reflect.get(actualDb, prop);
+    if (typeof value === "function") {
+      return value.bind(actualDb);
+    }
+    return value;
   },
 });
 
-export async function getDb(): Promise<Db> {
-  return connectToDatabase();
-}
+// Synchronous proxy for the MongoClient instance
+export const client = new Proxy({} as MongoClient, {
+  get(_target, prop) {
+    if (prop === "then" || prop === "toJSON") return undefined;
+    getDbInstance();
+    const actualClient = globalForMongo._mongoClient!;
+    const value = Reflect.get(actualClient, prop);
+    if (typeof value === "function") {
+      return value.bind(actualClient);
+    }
+    return value;
+  },
+});

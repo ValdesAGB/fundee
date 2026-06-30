@@ -8,39 +8,13 @@ import {
   Container,
   PageTitle,
   PageSubtitle,
-  Section,
-  SectionTitle,
-  SectionSubtitle,
-  Row,
-  Column,
-  FieldLabel,
-  FieldInput,
-  FieldTextarea,
-  AvatarBlock,
-  Avatar,
-  AvatarWrapper,
-  AvatarImg,
-  AvatarOverlay,
-  AvatarInfo,
-  AvatarName,
-  AvatarRole,
-  AvatarMenu,
-  AvatarMenuItem,
   Modal,
   ModalImg,
   ModalClose,
-  SaveBtn,
-  DangerBtn,
-  ToggleRow,
-  ToggleInfo,
-  ToggleLabel,
-  ToggleDesc,
-  Toggle,
-  ErrorBox,
-  SuccessBox,
-  AvatarSpinner,
 } from "./Settings.styles";
 import { Loader } from "../components/dots/Loader";
+import SecuritySection from "./SecuritySection";
+import ProfileSection from "./ProfileSection";
 
 export default function SettingsPage() {
   const [profile, setProfile] = useState({
@@ -49,6 +23,7 @@ export default function SettingsPage() {
     phone: "",
     description: "",
     address: "",
+    category: "",
     avatar: "",
   });
 
@@ -90,6 +65,7 @@ export default function SettingsPage() {
             phone: data.data.phone || "",
             description: data.data.description || "",
             address: data.data.address || "",
+            category: data.data.category || "",
             avatar: data.data.avatar || "",
           });
         }
@@ -156,6 +132,7 @@ export default function SettingsPage() {
             phone: newProfile.phone,
             description: newProfile.description,
             address: newProfile.address,
+            category: newProfile.category,
             avatar: data.url,
           }),
         });
@@ -209,289 +186,48 @@ export default function SettingsPage() {
         {loadingProfile ? (
           <Loader />
         ) : (
-          <Section>
-            {error && <ErrorBox>{error}</ErrorBox>}
-            {success && <SuccessBox>{success}</SuccessBox>}
-
-            <AvatarBlock>
-              <div style={{ position: "relative" }} ref={menuRef}>
-                <AvatarWrapper
-                  onClick={() =>
-                    !avatarUploading && setShowAvatarMenu(!showAvatarMenu)
-                  }
-                  title="Options de la photo"
-                >
-                  {profile.avatar ? (
-                    <AvatarImg src={profile.avatar} alt="avatar" />
-                  ) : (
-                    <Avatar>
-                      {profile.name
-                        ? profile.name.charAt(0).toUpperCase()
-                        : "P"}
-                    </Avatar>
-                  )}
-
-                  {avatarUploading ? (
-                    <AvatarSpinner /> // ← spinner visible sans survol
-                  ) : (
-                    <AvatarOverlay>
-                      <i className="bi bi-camera" />
-                    </AvatarOverlay>
-                  )}
-                </AvatarWrapper>
-
-                {/* ── Menu ── */}
-                {showAvatarMenu && (
-                  <AvatarMenu>
-                    {profile.avatar && (
-                      <AvatarMenuItem
-                        type="button"
-                        onClick={() => {
-                          setShowAvatarMenu(false);
-                          setShowModal(true);
-                        }}
-                      >
-                        <i className="bi bi-eye" />
-                        Voir la photo
-                      </AvatarMenuItem>
-                    )}
-                    <AvatarMenuItem type="button" onClick={handleUploadAvatar}>
-                      <i className="bi bi-pencil" />
-                      {profile.avatar ? "Modifier" : "Ajouter une photo"}
-                    </AvatarMenuItem>
-                    {profile.avatar && (
-                      <AvatarMenuItem
-                        type="button"
-                        $danger
-                        onClick={handleDeleteAvatar}
-                      >
-                        <i className="bi bi-trash3" />
-                        Supprimer
-                      </AvatarMenuItem>
-                    )}
-                  </AvatarMenu>
-                )}
-              </div>
-
-              <AvatarInfo>
-                <AvatarName>{profile.name || "Votre business"}</AvatarName>
-                <AvatarRole>BUSINESS</AvatarRole>
-              </AvatarInfo>
-            </AvatarBlock>
-
-            <SectionTitle>Informations du profil</SectionTitle>
-            <SectionSubtitle>
-              Mettez à jour les informations de votre business.
-            </SectionSubtitle>
-
-            <form
-              onSubmit={(e) =>
-                saveProfile(e, {
-                  profile,
-                  setProfile,
-                  setSaving,
-                  setError,
-                  setSuccess,
-                })
-              }
-            >
-              <Row>
-                <Column>
-                  <FieldLabel>Nom du business</FieldLabel>
-                  <FieldInput
-                    name="name"
-                    value={profile.name}
-                    onChange={handleProfileChange}
-                    placeholder="Nom du business"
-                  />
-                </Column>
-                <Column>
-                  <FieldLabel>Téléphone</FieldLabel>
-                  <FieldInput
-                    name="phone"
-                    value={profile.phone}
-                    onChange={handleProfileChange}
-                    placeholder="+229 00 00 00 00"
-                    onKeyDown={(e) => {
-                      const allowed = /[0-9+\s\-().]/;
-                      if (!allowed.test(e.key) && e.key.length === 1) {
-                        e.preventDefault();
-                      }
-                    }}
-                  />
-                </Column>
-              </Row>
-
-              <FieldLabel>Email</FieldLabel>
-              <FieldInput
-                name="email"
-                type="email"
-                value={profile.email}
-                onChange={handleProfileChange}
-                placeholder="email@business.com"
-                disabled
-              />
-
-              <FieldLabel>Description</FieldLabel>
-              <FieldTextarea
-                name="description"
-                value={profile.description}
-                onChange={handleProfileChange}
-                placeholder="Description de votre business"
-              />
-
-              <FieldLabel>Adresse physique</FieldLabel>
-              <FieldInput
-                name="address"
-                value={profile.address}
-                onChange={handleProfileChange}
-                placeholder="Adresse du business"
-              />
-
-              <SaveBtn type="submit" disabled={saving}>
-                <i className="bi bi-check-lg" />
-                {saving ? "Sauvegarde..." : "Sauvegarder"}
-              </SaveBtn>
-            </form>
-          </Section>
+          <ProfileSection
+            error={error}
+            success={success}
+            profile={profile}
+            setProfile={setProfile}
+            handleProfileChange={handleProfileChange}
+            saveProfile={saveProfile}
+            saving={saving}
+            setSaving={setSaving}
+            setError={setError}
+            setSuccess={setSuccess}
+            avatarUploading={avatarUploading}
+            setShowAvatarMenu={setShowAvatarMenu}
+            showAvatarMenu={showAvatarMenu}
+            menuRef={menuRef}
+            setShowModal={setShowModal}
+            handleUploadAvatar={handleUploadAvatar}
+            handleDeleteAvatar={handleDeleteAvatar}
+          />
         )}
 
         {/* ── Mot de passe ── */}
-        <Section>
-          <SectionTitle>Sécurité</SectionTitle>
-          <SectionSubtitle>Modifiez votre mot de passe.</SectionSubtitle>
+        <SecuritySection
+          passwordError={passwordError}
+          passwordSuccess={passwordSuccess}
+          savePassword={savePassword}
+          passwords={passwords}
+          setPasswords={setPasswords}
+          handlePasswordChange={handlePasswordChange}
+          savingPassword={savingPassword}
+          setSavingPassword={setSavingPassword}
+          setPasswordError={setPasswordError}
+          setPasswordSuccess={setPasswordSuccess}
+        />
+        {/* 
+        <Notifications
+          notifications={notifications}
+          setNotifications={setNotifications}
+        />
 
-          {passwordError && <ErrorBox>{passwordError}</ErrorBox>}
-          {passwordSuccess && <SuccessBox>{passwordSuccess}</SuccessBox>}
-
-          <form
-            onSubmit={(e) =>
-              savePassword(e, {
-                passwords,
-                setPasswords,
-                setSavingPassword,
-                setPasswordError,
-                setPasswordSuccess,
-              })
-            }
-          >
-            <FieldLabel>Mot de passe actuel</FieldLabel>
-            <FieldInput
-              name="currentPassword"
-              type="password"
-              value={passwords.currentPassword}
-              onChange={handlePasswordChange}
-              placeholder="••••••••"
-              required
-            />
-
-            <Row>
-              <Column>
-                <FieldLabel>Nouveau mot de passe</FieldLabel>
-                <FieldInput
-                  name="newPassword"
-                  type="password"
-                  value={passwords.newPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="••••••••"
-                  required
-                />
-              </Column>
-              <Column>
-                <FieldLabel>Confirmer</FieldLabel>
-                <FieldInput
-                  name="confirmPassword"
-                  type="password"
-                  value={passwords.confirmPassword}
-                  onChange={handlePasswordChange}
-                  placeholder="••••••••"
-                  required
-                />
-              </Column>
-            </Row>
-
-            <SaveBtn type="submit" disabled={savingPassword}>
-              <i className="bi bi-shield-lock" />
-              {savingPassword ? "Mise à jour..." : "Mettre à jour"}
-            </SaveBtn>
-          </form>
-        </Section>
-
-        {/* ── Notifications ── 
-        <Section>
-          <SectionTitle>Notifications</SectionTitle>
-          <SectionSubtitle>
-            Choisissez les notifications que vous souhaitez recevoir.
-          </SectionSubtitle>
-
-          <ToggleRow>
-            <ToggleInfo>
-              <ToggleLabel>Notifications par email</ToggleLabel>
-              <ToggleDesc>
-                Recevez des emails pour les activités importantes.
-              </ToggleDesc>
-            </ToggleInfo>
-            <Toggle
-              type="button"
-              $active={notifications.emailNotifications}
-              onClick={() =>
-                setNotifications({
-                  ...notifications,
-                  emailNotifications: !notifications.emailNotifications,
-                })
-              }
-            />
-          </ToggleRow>
-
-          <ToggleRow>
-            <ToggleInfo>
-              <ToggleLabel>Alertes de commandes</ToggleLabel>
-              <ToggleDesc>Soyez notifié à chaque nouvelle commande.</ToggleDesc>
-            </ToggleInfo>
-            <Toggle
-              type="button"
-              $active={notifications.orderAlerts}
-              onClick={() =>
-                setNotifications({
-                  ...notifications,
-                  orderAlerts: !notifications.orderAlerts,
-                })
-              }
-            />
-          </ToggleRow>
-
-          <ToggleRow>
-            <ToggleInfo>
-              <ToggleLabel>Emails marketing</ToggleLabel>
-              <ToggleDesc>
-                Recevez des conseils et nouvelles fonctionnalités.
-              </ToggleDesc>
-            </ToggleInfo>
-            <Toggle
-              type="button"
-              $active={notifications.marketingEmails}
-              onClick={() =>
-                setNotifications({
-                  ...notifications,
-                  marketingEmails: !notifications.marketingEmails,
-                })
-              }
-            />
-          </ToggleRow>
-        </Section>*/}
-
-        {/* ── Danger zone ── 
-        <Section>
-          <SectionTitle>Zone de danger</SectionTitle>
-          <SectionSubtitle>
-            Ces actions sont irréversibles. Soyez prudent.
-          </SectionSubtitle>
-
-          <DangerBtn type="button" onClick={() => deleteAccount({ setError })}>
-            <i className="bi bi-trash3" />
-            Supprimer mon compte
-          </DangerBtn>
-        </Section>*/}
+        <DangerZone deleteAccount={deleteAccount} setError={setError} />
+        */}
       </Container>
 
       {/* ── Modal photo ── */}

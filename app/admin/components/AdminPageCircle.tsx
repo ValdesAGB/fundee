@@ -1,4 +1,4 @@
-import { FoodIcon, FoodRow, Stamp, StampSvg } from "../Admin.styles";
+import { FoodIcon, FoodRow, Stamp, StampSvg } from "../../Admin.styles";
 
 export default function AdminPageCircle() {
   return (

@@ -1,65 +1,172 @@
-import Image from "next/image";
+// app/admin/page.tsx
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
+import AppName from "./admin/components/AppName";
+import {
+  Actions,
+  BgCanvas,
+  BgFood,
+  Cursor,
+  Eyebrow,
+  Foot,
+  Hero,
+  Main,
+  Nav,
+  NavBadge,
+  NavBrand,
+  NavDot,
+  OrbRing,
+  OrbRingInner,
+  Page,
+  PrimaryBtn,
+  SecondaryBtn,
+  StatLabel,
+  StatNumber,
+  StatPill,
+  StatRow,
+  Subtitle,
+  Ticket,
+  TicketEdge,
+  TicketHeader,
+  TicketItem,
+  TicketItemName,
+  TicketList,
+  TicketMeta,
+  TicketNewPrice,
+  TicketOldPrice,
+  TicketPrices,
+  TicketShop,
+  TicketTotal,
+  TicketTotalLabel,
+  TicketTotalValue,
+  TicketWrap,
+  Title,
+  TitleAccent,
+  TitleWrap,
+} from "./Admin.styles";
+import { useTypewriter } from "./admin/components/TypeFunction";
+import { useTicketItems } from "./admin/components/TicketItemsFunction";
+import { bgItems, stats } from "./admin/components/data";
+
+/* ── Page ───────────────────────────────────────────────── */
+export default function AdminLandingPage() {
+  const { displayed, phase } = useTypewriter();
+  const { items, visible } = useTicketItems();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <Page className="row">
+      <BgCanvas>
+        {bgItems.map(
+          (
+            { Icon, top, left, right, bottom, size, delay, dur, opacity },
+            i,
+          ) => (
+            <BgFood
+              key={i}
+              $top={top}
+              $left={left}
+              $right={right}
+              $bottom={bottom}
+              $size={size}
+              $delay={delay}
+              $duration={dur}
+              $opacity={opacity}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <Icon />
+            </BgFood>
+          ),
+        )}
+      </BgCanvas>
+
+      <Nav>
+        <NavBrand>
+          <NavDot />
+          <AppName />
+        </NavBrand>
+        <NavBadge>Bénin · BJ</NavBadge>
+      </Nav>
+
+      <Main>
+        {/* ── Colonne gauche ── */}
+        <Hero>
+          <Eyebrow>Anti-gaspillage alimentaire</Eyebrow>
+
+          <TitleWrap>
+            <Title>
+              {/* Affichage du texte avec retours à la ligne */}
+              {displayed.before.split("\n").map((line, i, arr) => (
+                <span key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </span>
+              ))}
+              <TitleAccent>{displayed.accent}</TitleAccent>
+              <Cursor $blink={phase === "pause"} />
+            </Title>
+          </TitleWrap>
+
+          <Subtitle>
+            Récupérez les invendus des restaurants, boulangeries et épiceries du
+            Bénin avant qu&apos;ils ne finissent à la poubelle — à prix réduit.
+          </Subtitle>
+
+          <StatRow>
+            {stats.map((s, i) => (
+              <StatPill key={s.label} $delay={0.5 + i * 0.12}>
+                <StatNumber>{s.number}</StatNumber>
+                <StatLabel>{s.label}</StatLabel>
+              </StatPill>
+            ))}
+          </StatRow>
+
+          <Actions>
+            <Link href="/admin/login" style={{ textDecoration: "none" }}>
+              <PrimaryBtn>Se connecter</PrimaryBtn>
+            </Link>
+            <Link href="/admin/register" style={{ textDecoration: "none" }}>
+              <SecondaryBtn>Créer un compte business</SecondaryBtn>
+            </Link>
+          </Actions>
+
+          <Foot>
+            Vous êtes un commerçant ? Rejoignez le mouvement anti-gaspi.
+          </Foot>
+        </Hero>
+
+        {/* ── Colonne droite — ticket ── */}
+        <TicketWrap aria-hidden="true">
+          <OrbRing $delay={0}>
+            <OrbRingInner />
+          </OrbRing>
+          <TicketEdge $position="top" />
+          <Ticket>
+            <TicketHeader>
+              <TicketShop>Reçu du jour</TicketShop>
+              <TicketMeta>120+ commerces · Cotonou</TicketMeta>
+            </TicketHeader>
+
+            <TicketList $visible={visible}>
+              {items.map((item, i) => (
+                <TicketItem key={item.name} $index={i}>
+                  <TicketItemName>{item.name}</TicketItemName>
+                  <TicketPrices>
+                    <TicketOldPrice>{item.old} F</TicketOldPrice>
+                    <TicketNewPrice>{item.price} F</TicketNewPrice>
+                  </TicketPrices>
+                </TicketItem>
+              ))}
+            </TicketList>
+
+            <TicketTotal>
+              <TicketTotalLabel>Économie moyenne</TicketTotalLabel>
+              <TicketTotalValue>−60%</TicketTotalValue>
+            </TicketTotal>
+          </Ticket>
+          <TicketEdge $position="bottom" />
+        </TicketWrap>
+      </Main>
+    </Page>
   );
 }

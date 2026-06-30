@@ -12,8 +12,6 @@ export const auth = betterAuth({
     enabled: true,
     hashOptions: { rounds: 12 },
     sendResetPassword: async ({ user, url }) => {
-      // Extraire le token de l'URL générée par Better Auth
-      const token = new URL(url).searchParams.get("token") || "";
       await sendBusinessResetPasswordEmail(user.email, url);
     },
   },
