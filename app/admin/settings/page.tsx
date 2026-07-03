@@ -74,6 +74,11 @@ export default function SettingsPage() {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [showAvatarMenu, setShowAvatarMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [businessCategories, setBusinessCategories] = useState<Array<{id: string, name: string, description?: string, icon?: string}>>([]);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<{id: string, name: string, description?: string, icon?: string} | null>(null);
+  const [newCategory, setNewCategory] = useState({ name: "", description: "", icon: "" });
+  const [savingCategory, setSavingCategory] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,6 +104,23 @@ export default function SettingsPage() {
       }
     };
     fetchProfile();
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/v1/business/categories", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setBusinessCategories((data.data || []).filter((c: any) => c.businessId));
+        }
+      } catch (err) {
+        console.error("Erreur chargement catégories", err);
+      }
+    };
+    fetchCategories();
   }, []);
 
   // ✅ Ferme le menu si clic en dehors
@@ -192,6 +214,88 @@ export default function SettingsPage() {
 
       setProfile({ ...profile, avatar: "" });
       setSuccess("Photo de profil supprimée.");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  // Category management
+  const handleSaveCategory = async () => {
+    if (!newCategory.name.trim()) {
+      setError("Le nom de la catégorie est requis");
+      return;
+    }
+    setSavingCategory(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const url = editingCategory
+        ? `/api/v1/business/categories/${editingCategory.id}`
+        : "/api/v1/business/categories";
+      const method = editingCategory ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newCategory.name,
+          description: newCategory.description || undefined,
+          icon: newCategory.icon || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Erreur lors de la sauvegarde");
+
+      // Refresh categories
+      const categoriesRes = await fetch("/api/v1/business/categories", {
+        credentials: "include",
+      });
+      const categoriesData = await categoriesRes.json();
+      if (categoriesRes.ok) {
+        setBusinessCategories((categoriesData.data || []).filter((c: any) => c.businessId));
+      }
+
+      setShowCategoryForm(false);
+      setEditingCategory(null);
+      setNewCategory({ name: "", description: "", icon: "" });
+      setSuccess(editingCategory ? "Catégorie mise à jour" : "Catégorie créée");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
+  const handleEditCategory = (category: typeof businessCategories[0]) => {
+    setEditingCategory(category);
+    setNewCategory({
+      name: category.name,
+      description: category.description || "",
+      icon: category.icon || "",
+    });
+    setShowCategoryForm(true);
+  };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!confirm("Supprimer cette catégorie ?")) return;
+
+    setError("");
+    setSuccess("");
+
+    try {
+      const res = await fetch(`/api/v1/business/categories/${categoryId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Erreur lors de la suppression");
+
+      setBusinessCategories(businessCategories.filter((c) => c.id !== categoryId));
+      setSuccess("Catégorie supprimée");
     } catch (err: any) {
       setError(err.message);
     }
@@ -355,6 +459,173 @@ export default function SettingsPage() {
             </form>
           </Section>
         )}
+
+        {/* ── Catégories ── */}
+        <Section>
+          <SectionTitle>Catégories de votre business</SectionTitle>
+          <SectionSubtitle>
+            Créez et gérez les catégories spécifiques à votre business. Ces
+            catégories seront disponibles lors de l'ajout de produits.
+          </SectionSubtitle>
+
+          {error && <ErrorBox>{error}</ErrorBox>}
+          {success && <SuccessBox>{success}</SuccessBox>}
+
+          {!showCategoryForm ? (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginBottom: 16,
+                }}
+              >
+                {businessCategories.length === 0 ? (
+                  <p style={{ color: "#888", fontSize: 14 }}>
+                    Aucune catégorie pour le moment. Créez-en une pour
+                    commencer.
+                  </p>
+                ) : (
+                  businessCategories.map((cat) => (
+                    <div
+                      key={cat.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "8px 16px",
+                        borderRadius: 20,
+                        border: "1px solid #ddd",
+                        background: "#f9f9f9",
+                      }}
+                    >
+                      {cat.icon && <span>{cat.icon}</span>}
+                      <span style={{ fontSize: 14, fontWeight: 500 }}>
+                        {cat.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleEditCategory(cat)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "#ff6b00",
+                          padding: 0,
+                          marginLeft: 4,
+                        }}
+                        title="Modifier"
+                      >
+                        <i className="bi bi-pencil" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteCategory(cat.id)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          cursor: "pointer",
+                          color: "#dc3545",
+                          padding: 0,
+                        }}
+                        title="Supprimer"
+                      >
+                        <i className="bi bi-trash3" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <SaveBtn
+                type="button"
+                onClick={() => {
+                  setEditingCategory(null);
+                  setNewCategory({ name: "", description: "", icon: "" });
+                  setShowCategoryForm(true);
+                }}
+              >
+                <i className="bi bi-plus-lg" />
+                Ajouter une catégorie
+              </SaveBtn>
+            </>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 12,
+                padding: 16,
+                border: "1px solid #eee",
+                borderRadius: 8,
+              }}
+            >
+              <FieldLabel>Nom de la catégorie *</FieldLabel>
+              <FieldInput
+                value={newCategory.name}
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, name: e.target.value })
+                }
+                placeholder="Ex: Électronique, Alimentaire, Mode..."
+              />
+
+              <FieldLabel>Icône (emoji)</FieldLabel>
+              <FieldInput
+                value={newCategory.icon}
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, icon: e.target.value })
+                }
+                placeholder="📱, 🍔, 👕..."
+                maxLength={2}
+              />
+
+              <FieldLabel>Description</FieldLabel>
+              <FieldTextarea
+                value={newCategory.description}
+                onChange={(e) =>
+                  setNewCategory({
+                    ...newCategory,
+                    description: e.target.value,
+                  })
+                }
+                placeholder="Description de la catégorie (optionnel)"
+              />
+
+              <div style={{ display: "flex", gap: 8 }}>
+                <SaveBtn
+                  type="button"
+                  onClick={handleSaveCategory}
+                  disabled={savingCategory}
+                >
+                  <i className="bi bi-check-lg" />
+                  {savingCategory
+                    ? "Sauvegarde..."
+                    : editingCategory
+                    ? "Mettre à jour"
+                    : "Créer"}
+                </SaveBtn>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCategoryForm(false);
+                    setEditingCategory(null);
+                    setNewCategory({ name: "", description: "", icon: "" });
+                  }}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: 6,
+                    border: "1px solid #ddd",
+                    background: "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          )}
+        </Section>
 
         {/* ── Mot de passe ── */}
         <Section>

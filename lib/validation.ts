@@ -28,6 +28,7 @@ export const registerBusinessSchema = z.object({
   description: z.string().optional(),
   phone: z.string().optional(),
   address: z.string().optional(),
+  categoryIds: z.array(z.string()).optional(),
 });
 
 // ============================================
@@ -40,6 +41,15 @@ export const updateUserProfileSchema = z.object({
   phone: z.string().optional(),
   image: z.string().url("URL d'image invalide").optional(),
   notificationsEnabled: z.boolean().optional(),
+});
+
+// Business profile update schema
+export const updateBusinessProfileSchema = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  categoryIds: z.array(z.string()).optional(),
 });
 
 export const changePasswordSchema = z.object({
@@ -206,6 +216,22 @@ export const createNotificationSchema = z.object({
   type: z.enum(["PROMOTION", "ORDER_UPDATE", "GENERAL"]).default("GENERAL"),
   link: z.string().optional(),
   userIds: z.array(z.string()).optional(), // If empty, send to all users
+});
+
+// ============================================
+// Business Category Schemas
+// ============================================
+
+export const createBusinessCategorySchema = z.object({
+  name: z.string().min(1, "Le nom de la catégorie est requis"),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+});
+
+export const updateBusinessCategorySchema = z.object({
+  name: z.string().min(1).optional(),
+  description: z.string().optional(),
+  icon: z.string().optional(),
 });
 
 // ============================================

@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
+import { ObjectId } from 'mongodb';
 import { hashPassword, generateBusinessToken } from '@/lib/auth';
 import { validateBody, registerBusinessSchema } from '@/lib/validation';
 import { Errors, successResponse, handleRouteError } from '@/lib/errors';
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
             return Errors.validationError(validation.error);
         }
 
-        const { email, password, name, description, phone, address } = validation.data;
+        const { email, password, name, description, phone, address, categoryIds } = validation.data;
 
         // Check if business already exists
         const existingBusiness = await db.collection('business').findOne({ email });
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
             description,
             phone,
             address,
+            categoryIds: categoryIds || [],
             createdAt: now,
             updatedAt: now
         });
@@ -56,6 +58,7 @@ export async function POST(request: NextRequest) {
                     description,
                     phone,
                     address,
+                    categoryIds: categoryIds || [],
                     createdAt: now
                 },
                 token,

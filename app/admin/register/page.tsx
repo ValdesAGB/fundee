@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import SlideDots from "../components/dots/Animation";
 import {
@@ -32,6 +32,13 @@ import {
   SuccessText,
 } from "./Register.styles";
 
+interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  icon?: string;
+}
+
 export default function RegisterPage() {
   const router = useRouter();
 
@@ -46,14 +53,51 @@ export default function RegisterPage() {
     role: "BUSINESS",
   });
 
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/v1/categories");
+        const data = await res.json();
+        if (res.ok) {
+          setCategories(data.data || []);
+        }
+      } catch (err) {
+        console.error("Erreur chargement catégories", err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCategoryToggle = (categoryId: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId]
+    );
+  };
+
+  const handleAddCustomCategory = () => {
+    if (!newCategoryName.trim()) return;
+    const customId = `custom-${Date.now()}`;
+    setCategories([
+      ...categories,
+      { id: customId, name: newCategoryName.trim() },
+    ]);
+    setSelectedCategories([...selectedCategories, customId]);
+    setNewCategoryName("");
   };
 
   const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -81,8 +125,16 @@ export default function RegisterPage() {
       return;
     }
 
+    // Separate real category IDs from custom (new) ones
+    const realCategoryIds = selectedCategories.filter((id) => !id.startsWith("custom-"));
+    const customCategoryNames = selectedCategories
+      .filter((id) => id.startsWith("custom-"))
+      .map((id) => categories.find((c) => c.id === id)?.name)
+      .filter(Boolean) as string[];
+
     try {
-      const res = await fetch("/api/auth/sign-up/email", {
+      // First, register the business
+      const res = await fetch("/api/v1/business/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -92,13 +144,29 @@ export default function RegisterPage() {
           phone: formData.phone,
           description: formData.description,
           address: formData.address,
-          role: formData.role,
+          categoryIds: realCategoryIds,
         }),
       });
 
       const data = await res.json();
       if (!res.ok)
-        throw { message: data?.message || "Erreur lors de l'inscription" };
+        throw new Error(data?.message || "Erreur lors de l'inscription");
+
+      // Then, if there are custom categories, create them via business categories API
+      // This requires auth, so we need to save the token and create categories
+      if (customCategoryNames.length > 0 && data.data?.token) {
+        const token = data.data.token;
+        for (const catName of customCategoryNames) {
+          await fetch("/api/v1/business/categories", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+            body: JSON.stringify({ name: catName }),
+          });
+        }
+      }
 
       setSuccess(true);
     } catch (err: any) {
@@ -193,6 +261,74 @@ export default function RegisterPage() {
                 placeholder="Adresse du business"
                 onChange={handleChange}
               />
+            </Field>
+
+            {/* ── Catégories ── */}
+            <Field>
+              <FieldLabel>Catégories de votre business</FieldLabel>
+              <p style={{ fontSize: 12, color: "#888", margin: "4px 0 8px 0" }}>
+                Sélectionnez les catégories qui décrivent votre activité. Vous
+                pourrez les modifier plus tard dans les paramètres.
+              </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+                {categories.length === 0 ? (
+                  <p style={{ color: "#888", fontSize: 14, margin: 0 }}>
+                    Aucune catégorie existante. Ajoutez-en une ci-dessous.
+                  </p>
+                ) : (
+                  categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => handleCategoryToggle(cat.id)}
+                      style={{
+                        padding: "8px 16px",
+                        borderRadius: 20,
+                        border: "1px solid #ddd",
+                        background: selectedCategories.includes(cat.id) ? "#ff6b00" : "#fff",
+                        color: selectedCategories.includes(cat.id) ? "#fff" : "#333",
+                        cursor: "pointer",
+                        fontSize: 14,
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {cat.icon && <span style={{ marginRight: 6 }}>{cat.icon}</span>}
+                      {cat.name}
+                    </button>
+                  ))
+                )}
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+                <FieldInput
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Ajouter une catégorie personnalisée..."
+                  style={{ flex: 1 }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCustomCategory();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCustomCategory}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 6,
+                    border: "none",
+                    background: "#ff6b00",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    fontWeight: 500,
+                  }}
+                >
+                  + Ajouter
+                </button>
+              </div>
             </Field>
 
             <Row>

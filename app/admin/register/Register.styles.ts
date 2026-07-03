@@ -222,6 +222,8 @@ export const FieldInput = styled.input`
     border-color 0.2s,
     box-shadow 0.2s;
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
 
   &::placeholder {
     color: #c4c4c4;
@@ -243,6 +245,8 @@ export const FieldTextarea = styled.textarea`
   resize: none;
   height: 80px;
   outline: none;
+  width: 100%;
+  box-sizing: border-box;
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
