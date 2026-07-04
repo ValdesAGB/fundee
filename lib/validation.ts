@@ -41,6 +41,7 @@ export const updateUserProfileSchema = z.object({
   phone: z.string().optional(),
   image: z.string().url("URL d'image invalide").optional(),
   notificationsEnabled: z.boolean().optional(),
+  categoryIds: z.array(z.string()).optional(),
 });
 
 // Business profile update schema

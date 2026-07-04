@@ -133,10 +133,10 @@ export default function RegisterPage() {
       .filter(Boolean) as string[];
 
     try {
-      // First, register the business
-      const res = await fetch("/api/v1/business/auth/register", {
+      const res = await fetch("/api/auth/sign-up/email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -144,7 +144,7 @@ export default function RegisterPage() {
           phone: formData.phone,
           description: formData.description,
           address: formData.address,
-          categoryIds: realCategoryIds,
+          role: formData.role,
         }),
       });
 
@@ -152,19 +152,29 @@ export default function RegisterPage() {
       if (!res.ok)
         throw new Error(data?.message || "Erreur lors de l'inscription");
 
-      // Then, if there are custom categories, create them via business categories API
-      // This requires auth, so we need to save the token and create categories
-      if (customCategoryNames.length > 0 && data.data?.token) {
-        const token = data.data.token;
-        for (const catName of customCategoryNames) {
-          await fetch("/api/v1/business/categories", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({ name: catName }),
+      const userId = data?.user?.id || data?.data?.user?.id;
+
+      if (userId) {
+        // Save categoryIds to the user
+        if (realCategoryIds.length > 0) {
+          await fetch("/api/v1/user/profile", {
+            method: "PUT",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ categoryIds: realCategoryIds }),
           });
+        }
+
+        // Create custom categories
+        if (customCategoryNames.length > 0) {
+          for (const catName of customCategoryNames) {
+            await fetch("/api/v1/business/categories", {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: catName }),
+            });
+          }
         }
       }
 
