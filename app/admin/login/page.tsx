@@ -63,6 +63,21 @@ export default function LoginPage() {
         throw { message: data?.message || "Email ou mot de passe incorrect" };
       }
 
+      // Create pending custom categories from registration
+      const pending = localStorage.getItem("pendingCustomCategories");
+      if (pending) {
+        const names: string[] = JSON.parse(pending);
+        for (const name of names) {
+          await fetch("/api/v1/business/categories", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name }),
+          });
+        }
+        localStorage.removeItem("pendingCustomCategories");
+      }
+
       window.location.href = "/admin/products";
     } catch (err: any) {
       setError(err.message);

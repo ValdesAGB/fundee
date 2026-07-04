@@ -125,12 +125,8 @@ export default function RegisterPage() {
       return;
     }
 
-    // Separate real category IDs from custom (new) ones
+    // Only save real (global) category IDs — custom ones will be created after login
     const realCategoryIds = selectedCategories.filter((id) => !id.startsWith("custom-"));
-    const customCategoryNames = selectedCategories
-      .filter((id) => id.startsWith("custom-"))
-      .map((id) => categories.find((c) => c.id === id)?.name)
-      .filter(Boolean) as string[];
 
     try {
       const res = await fetch("/api/auth/sign-up/email", {
@@ -152,30 +148,23 @@ export default function RegisterPage() {
       if (!res.ok)
         throw new Error(data?.message || "Erreur lors de l'inscription");
 
-      const userId = data?.user?.id || data?.data?.user?.id;
+      // Save selected category IDs (custom ones excluded — user will create them after login)
+      if (realCategoryIds.length > 0) {
+        await fetch("/api/v1/user/profile", {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ categoryIds: realCategoryIds }),
+        });
+      }
 
-      if (userId) {
-        // Save categoryIds to the user
-        if (realCategoryIds.length > 0) {
-          await fetch("/api/v1/user/profile", {
-            method: "PUT",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ categoryIds: realCategoryIds }),
-          });
-        }
-
-        // Create custom categories
-        if (customCategoryNames.length > 0) {
-          for (const catName of customCategoryNames) {
-            await fetch("/api/v1/business/categories", {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name: catName }),
-            });
-          }
-        }
+      // Store custom category names in localStorage so they can be created after login
+      const customNames = selectedCategories
+        .filter((id) => id.startsWith("custom-"))
+        .map((id) => categories.find((c) => c.id === id)?.name)
+        .filter(Boolean) as string[];
+      if (customNames.length > 0) {
+        localStorage.setItem("pendingCustomCategories", JSON.stringify(customNames));
       }
 
       setSuccess(true);

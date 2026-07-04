@@ -7,6 +7,13 @@ import { sendBusinessResetPasswordEmail } from "@/lib/mail";
 export const auth = betterAuth({
   database: mongodbAdapter(db),
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    process.env.BETTER_AUTH_URL || "",
+    process.env.NEXT_PUBLIC_APP_URL || "",
+    process.env.ALLOWED_ORIGIN || "",
+  ].filter(Boolean),
 
   emailAndPassword: {
     enabled: true,
