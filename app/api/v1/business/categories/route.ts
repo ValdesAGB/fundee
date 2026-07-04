@@ -1,17 +1,17 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { ObjectId } from 'mongodb';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { successResponse, Errors, handleRouteError } from '@/lib/errors';
 import { validateBody, createBusinessCategorySchema, updateBusinessCategorySchema } from '@/lib/validation';
 
-export const GET = requireBusinessAuth(async (request: NextRequest, business) => {
+export const GET = requireAuth(async (request: NextRequest, user) => {
     try {
         const categories = await db.collection('category').find({
             $or: [
                 { businessId: { $exists: false } },
                 { businessId: null },
-                { businessId: business.businessId }
+                { businessId: user.userId }
             ]
         }).sort({ name: 1 }).toArray();
 
@@ -27,7 +27,7 @@ export const GET = requireBusinessAuth(async (request: NextRequest, business) =>
     }
 });
 
-export const POST = requireBusinessAuth(async (request: NextRequest, business) => {
+export const POST = requireAuth(async (request: NextRequest, user) => {
     try {
         const validation = await validateBody(request, createBusinessCategorySchema);
 
@@ -47,7 +47,7 @@ export const POST = requireBusinessAuth(async (request: NextRequest, business) =
             slug: finalSlug,
             description,
             icon,
-            businessId: business.businessId,
+            businessId: user.userId,
             isGlobal: false,
             createdAt: now,
             updatedAt: now

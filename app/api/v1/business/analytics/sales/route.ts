@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { successResponse, handleRouteError } from '@/lib/errors';
 
-export const GET = requireBusinessAuth(async (request: NextRequest, user) => {
+export const GET = requireAuth(async (request: NextRequest, user) => {
     try {
         const { searchParams } = new URL(request.url);
         const rawPeriod = parseInt(searchParams.get('period') || '30', 10);

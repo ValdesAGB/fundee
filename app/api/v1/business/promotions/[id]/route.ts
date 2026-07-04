@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { validateBody, updatePromotionSchema } from '@/lib/validation';
 import { successResponse, Errors, handleRouteError } from '@/lib/errors';
 import { ObjectId } from 'mongodb';
 
-export const PUT = requireBusinessAuth(async (
+export const PUT = requireAuth(async (
     request: NextRequest,
     user,
     { params }: any
@@ -73,7 +73,7 @@ export const PUT = requireBusinessAuth(async (
     }
 });
 
-export const DELETE = requireBusinessAuth(async (
+export const DELETE = requireAuth(async (
     request: NextRequest,
     user,
     { params }: any

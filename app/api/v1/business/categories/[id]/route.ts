@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { ObjectId } from 'mongodb';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { successResponse, Errors, handleRouteError } from '@/lib/errors';
 import { validateBody, updateBusinessCategorySchema } from '@/lib/validation';
 
-export const PUT = requireBusinessAuth(async (request: NextRequest, business, { params }: any) => {
+export const PUT = requireAuth(async (request: NextRequest, user, { params }: any) => {
     try {
         const { id } = await params;
 
@@ -22,7 +22,7 @@ export const PUT = requireBusinessAuth(async (request: NextRequest, business, { 
         try {
             category = await db.collection('category').findOne({
                 _id: new ObjectId(id),
-                businessId: business.businessId
+                businessId: user.userId
             });
         } catch {
             return Errors.notFound('Catégorie');
@@ -57,14 +57,14 @@ export const PUT = requireBusinessAuth(async (request: NextRequest, business, { 
     }
 });
 
-export const DELETE = requireBusinessAuth(async (request: NextRequest, business, { params }: any) => {
+export const DELETE = requireAuth(async (request: NextRequest, user, { params }: any) => {
     try {
         const { id } = await params;
 
         // Verify category belongs to this business
         const category = await db.collection('category').findOne({
             _id: new ObjectId(id),
-            businessId: business.businessId
+            businessId: user.userId
         });
 
         if (!category) {

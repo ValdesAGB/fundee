@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { validateBody, createNotificationSchema } from '@/lib/validation';
 import { successResponse, Errors, handleRouteError } from '@/lib/errors';
 
-export const POST = requireBusinessAuth(async (request: NextRequest, user) => {
+export const POST = requireAuth(async (request: NextRequest, user) => {
     try {
         const validation = await validateBody(request, createNotificationSchema);
 
@@ -22,7 +22,7 @@ export const POST = requireBusinessAuth(async (request: NextRequest, user) => {
         }
 
         // Prefix the link with the businessId so we can filter notifications per business
-        const businessLink = `business:${user.businessId}:${link ?? ''}`;
+        const businessLink = `business:${user.userId}:${link ?? ''}`;
 
         // Create notifications for all target users
         const notificationsData = targetUserIds.map((userId: string) => ({
@@ -48,14 +48,14 @@ export const POST = requireBusinessAuth(async (request: NextRequest, user) => {
     }
 });
 
-export const GET = requireBusinessAuth(async (request: NextRequest, user) => {
+export const GET = requireAuth(async (request: NextRequest, user) => {
     try {
         // Return only notifications sent by users belonging to this business's products
         // We deduplicate by (title, message, type) sent in the same batch, using the link
         // field to store the businessId as a prefix when creating notifications.
         // Filtering by link prefix `business:<id>` ensures isolation per business.
         const pipeline = [
-            { $match: { link: { $regex: `^business:${user.businessId}:` } } },
+            { $match: { link: { $regex: `^business:${user.userId}:` } } },
             { $sort: { createdAt: -1 } },
             {
                 $group: {

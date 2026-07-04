@@ -1,11 +1,11 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { validateBody, createPromotionSchema } from '@/lib/validation';
 import { successResponse, Errors, handleRouteError } from '@/lib/errors';
 import { ObjectId } from 'mongodb';
 
-export const GET = requireBusinessAuth(async (request: NextRequest, user) => {
+export const GET = requireAuth(async (request: NextRequest, user) => {
     try {
         const promotions = await db.collection('promotion')
             .find({ businessId: user.userId })
@@ -41,7 +41,7 @@ export const GET = requireBusinessAuth(async (request: NextRequest, user) => {
     }
 });
 
-export const POST = requireBusinessAuth(async (request: NextRequest, user) => {
+export const POST = requireAuth(async (request: NextRequest, user) => {
     try {
         const validation = await validateBody(request, createPromotionSchema);
 

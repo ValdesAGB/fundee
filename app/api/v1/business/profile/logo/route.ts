@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { requireBusinessAuth } from '@/lib/middleware';
+import { requireAuth } from '@/lib/middleware';
 import { Errors, successResponse, handleRouteError } from '@/lib/errors';
 import { ObjectId } from 'mongodb';
 import fs from 'fs/promises';
@@ -26,7 +26,7 @@ async function ensureUploadDir() {
  * POST /api/v1/business/profile/logo
  * Upload or update the business logo
  */
-export const POST = requireBusinessAuth(async (request: NextRequest, { businessId }) => {
+export const POST = requireAuth(async (request: NextRequest, user) => {
     try {
         await ensureUploadDir();
         
@@ -49,12 +49,12 @@ export const POST = requireBusinessAuth(async (request: NextRequest, { businessI
 
         const buffer = Buffer.from(await file.arrayBuffer());
         const extension = file.type.split('/')[1];
-        const fileName = `logo_${businessId}_${crypto.randomBytes(4).toString('hex')}.${extension}`;
+        const fileName = `logo_${user.userId}_${crypto.randomBytes(4).toString('hex')}.${extension}`;
         const filePath = path.join(UPLOAD_DIR, fileName);
         const publicUrl = `/uploads/business/logos/${fileName}`;
 
         // Get current business to delete old logo if exists
-        const business = await db.collection('business').findOne({ _id: new ObjectId(businessId) });
+        const business = await db.collection('business').findOne({ _id: new ObjectId(user.userId) });
         
         if (business?.logo && typeof business.logo === 'string' && business.logo.startsWith('/uploads/')) {
             const oldPath = path.join(process.cwd(), 'public', business.logo);
@@ -71,7 +71,7 @@ export const POST = requireBusinessAuth(async (request: NextRequest, { businessI
 
         // Update database
         await db.collection('business').updateOne(
-            { _id: new ObjectId(businessId) },
+            { _id: new ObjectId(user.userId) },
             { 
                 $set: { 
                     logo: publicUrl,
@@ -90,9 +90,9 @@ export const POST = requireBusinessAuth(async (request: NextRequest, { businessI
  * DELETE /api/v1/business/profile/logo
  * Remove the business logo
  */
-export const DELETE = requireBusinessAuth(async (request: NextRequest, { businessId }) => {
+export const DELETE = requireAuth(async (request: NextRequest, user) => {
     try {
-        const business = await db.collection('business').findOne({ _id: new ObjectId(businessId) });
+        const business = await db.collection('business').findOne({ _id: new ObjectId(user.userId) });
 
         if (!business?.logo) {
             return Errors.notFound('Aucun logo à supprimer');
@@ -109,7 +109,7 @@ export const DELETE = requireBusinessAuth(async (request: NextRequest, { busines
 
         // Update database
         await db.collection('business').updateOne(
-            { _id: new ObjectId(businessId) },
+            { _id: new ObjectId(user.userId) },
             { 
                 $set: { 
                     logo: null,
