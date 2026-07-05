@@ -1,8 +1,9 @@
 import { db, getDb } from "../lib/db";
-import { hashPassword } from "../lib/auth";
+import { auth, hashPassword } from "../lib/auth";
 
 async function main() {
   console.log("🌱 Starting database seed...");
+  const authCtx = await auth.$context;
 
   // Create categories
   const categoriesData = [
@@ -43,7 +44,6 @@ async function main() {
   }
   console.log("✅ Categories created");
 
-  // Create test user — password stored in Account (better-auth credential provider)
   let testUser = await db
     .collection("user")
     .findOne({ email: "user@test.com" });
@@ -60,14 +60,22 @@ async function main() {
       updatedAt: new Date(),
     });
     testUser = { _id: result.insertedId, email: "user@test.com" };
-
-    await db.collection("account").insertOne({
-      userId: testUser._id.toString(),
-      accountId: "credential",
-      providerId: "credential",
-      password: await hashPassword("password123"),
-    });
   }
+
+  await db.collection("account").updateOne(
+    { userId: testUser._id, providerId: "credential" },
+    {
+      $set: {
+        userId: testUser._id,
+        accountId: testUser._id.toString(),
+        providerId: "credential",
+        password: await authCtx.password.hash("password123"),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    },
+    { upsert: true }
+  );
   console.log("✅ Test user created");
 
   // Create test businesses (Stores)
@@ -166,6 +174,7 @@ async function main() {
       businessId: businesses[1]._id.toString(),
       categoryId: categories[1]._id.toString(),
       isActive: true,
+      isAntiGaspillage: true,
     },
     {
       name: "Pain Artisanal",
@@ -177,6 +186,20 @@ async function main() {
       businessId: businesses[1]._id.toString(),
       categoryId: categories[1]._id.toString(),
       isActive: true,
+      isAntiGaspillage: true,
+    },
+    {
+      name: "Légumes Imparfaits",
+      slug: "legumes-imparfaits-seed",
+      description: "Légumes frais de saison avec petits défauts visuels, sauvés du gaspillage",
+      price: 4.5,
+      compareAtPrice: 12.0,
+      stock: 15,
+      images: ["/uploads/veg1.jpg"],
+      businessId: businesses[1]._id.toString(),
+      categoryId: categories[1]._id.toString(),
+      isActive: true,
+      isAntiGaspillage: true,
     },
     {
       name: "Audemars Piguet",
@@ -209,6 +232,12 @@ async function main() {
     if (!prod) {
       const result = await db.collection("product").insertOne(prodData);
       prod = { ...prodData, _id: result.insertedId };
+    } else {
+      await db.collection("product").updateOne(
+        { _id: prod._id },
+        { $set: prodData }
+      );
+      prod = { ...prod, ...prodData };
     }
     products.push(prod);
   }

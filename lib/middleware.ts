@@ -19,7 +19,10 @@ export type TokenPayload = {
  * Supports both cookie-based sessions and Bearer token (via the bearer plugin).
  */
 async function getUserFromSession(request: NextRequest): Promise<AuthUser | null> {
+    console.log(`[Auth Debug] Path: ${request.nextUrl.pathname}`);
+    console.log(`[Auth Debug] Authorization header: ${request.headers.get("authorization")}`);
     const session = await auth.api.getSession({ headers: request.headers });
+    console.log(`[Auth Debug] getSession result: ${session ? "Found session for " + session.user.email : "No session found"}`);
     if (!session?.user) return null;
     return session.user as AuthUser;
 }
