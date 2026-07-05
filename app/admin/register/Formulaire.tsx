@@ -112,7 +112,7 @@ export default function Formulaire({
                 Aucune catégorie existante. Ajoutez-en une ci-dessous.
               </p>
             ) : (
-              categories.map((cat) => (
+              categories.map((cat: any) => (
                 <button
                   key={cat.id}
                   type="button"
