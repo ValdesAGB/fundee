@@ -52,7 +52,7 @@ export const Left = styled.div`
 
 export const Form = styled.form`
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   padding: 20px 0;
@@ -222,8 +222,6 @@ export const FieldInput = styled.input`
     border-color 0.2s,
     box-shadow 0.2s;
   outline: none;
-  width: 100%;
-  box-sizing: border-box;
 
   &::placeholder {
     color: #c4c4c4;
@@ -245,8 +243,6 @@ export const FieldTextarea = styled.textarea`
   resize: none;
   height: 80px;
   outline: none;
-  width: 100%;
-  box-sizing: border-box;
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
@@ -380,4 +376,35 @@ export const SuccessText = styled.p`
   color: #6b7280;
   line-height: 1.7;
   max-width: 360px;
+`;
+
+export const FieldSelect = styled.select`
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  color: #111827;
+  background: white;
+  outline: none;
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+
+  &:focus {
+    border-color: #016232;
+    box-shadow: 0 0 0 3px rgba(1, 98, 50, 0.12);
+  }
+`;
+
+export const AddCategoryBtn = styled.button`
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: #ff6b00;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
 `;

@@ -1,88 +1,171 @@
-// app/page.tsx
+// app/admin/page.tsx
 "use client";
 
 import Link from "next/link";
+import AppName from "./admin/components/AppName";
 import {
-  Page,
-  Backdrop,
-  RescueRing,
+  Actions,
+  BgCanvas,
+  BgFood,
+  Cursor,
+  Eyebrow,
+  Foot,
+  Hero,
+  Main,
   Nav,
+  NavBadge,
   NavBrand,
   NavDot,
-  Hero,
-  Eyebrow,
-  Title,
-  TitleAccent,
-  Subtitle,
-  StatRow,
-  Stat,
-  StatNumber,
-  StatLabel,
-  Actions,
+  OrbRing,
+  OrbRingInner,
+  Page,
   PrimaryBtn,
   SecondaryBtn,
-  Foot,
+  StatLabel,
+  StatNumber,
+  StatPill,
+  StatRow,
+  Subtitle,
+  Ticket,
+  TicketEdge,
+  TicketHeader,
+  TicketItem,
+  TicketItemName,
+  TicketList,
+  TicketMeta,
+  TicketNewPrice,
+  TicketOldPrice,
+  TicketPrices,
+  TicketShop,
+  TicketTotal,
+  TicketTotalLabel,
+  TicketTotalValue,
+  TicketWrap,
+  Title,
+  TitleAccent,
+  TitleWrap,
 } from "./Home.styles";
-import AdminPageCircle from "./admin/components/AdminPageCircle";
-import AppName from "./admin/components/AppName";
+import { useTypewriter } from "./admin/components/TypeFunction";
+import { useTicketItems } from "./admin/components/TicketItemsFunction";
+import { bgItems, stats } from "./admin/components/data";
 
-export default function HomePage() {
+/* ── Page ───────────────────────────────────────────────── */
+export default function AdminLandingPage() {
+  const { displayed, phase } = useTypewriter();
+  const { items, visible } = useTicketItems();
+
   return (
     <Page className="row">
-      <Backdrop />
-      <RescueRing aria-hidden="true" />
+      <BgCanvas>
+        {bgItems.map(
+          (
+            { Icon, top, left, right, bottom, size, delay, dur, opacity },
+            i,
+          ) => (
+            <BgFood
+              key={i}
+              $top={top}
+              $left={left}
+              $right={right}
+              $bottom={bottom}
+              $size={size}
+              $delay={delay}
+              $duration={dur}
+              $opacity={opacity}
+            >
+              <Icon />
+            </BgFood>
+          ),
+        )}
+      </BgCanvas>
 
       <Nav>
         <NavBrand>
           <NavDot />
           <AppName />
         </NavBrand>
+        <NavBadge>Bénin · BJ</NavBadge>
       </Nav>
 
-      <Hero>
-        <Eyebrow>Anti-gaspillage alimentaire · Bénin BJ</Eyebrow>
+      <Main>
+        {/* ── Colonne gauche ── */}
+        <Hero>
+          <Eyebrow>Anti-gaspillage alimentaire</Eyebrow>
 
-        <AdminPageCircle />
+          <TitleWrap>
+            <Title>
+              {/* Affichage du texte avec retours à la ligne */}
+              {displayed.before.split("\n").map((line, i, arr) => (
+                <span key={i}>
+                  {line}
+                  {i < arr.length - 1 && <br />}
+                </span>
+              ))}
+              <TitleAccent>{displayed.accent}</TitleAccent>
+              <Cursor $blink={phase === "pause"} />
+            </Title>
+          </TitleWrap>
 
-        <Title>
-          Le bon repas,
-          <br />
-          au bon <TitleAccent>moment.</TitleAccent>
-        </Title>
+          <Subtitle>
+            Récupérez les invendus des restaurants, boulangeries et épiceries du
+            Bénin avant qu&apos;ils ne finissent à la poubelle — à prix réduit.
+          </Subtitle>
 
-        <Subtitle>
-          Récupérez les invendus des restaurants, boulangeries et épiceries de
-          Cotonou avant qu&apos;ils ne finissent à la poubelle — à prix réduit.
-        </Subtitle>
+          <StatRow>
+            {stats.map((s, i) => (
+              <StatPill key={s.label} $delay={0.5 + i * 0.12}>
+                <StatNumber>{s.number}</StatNumber>
+                <StatLabel>{s.label}</StatLabel>
+              </StatPill>
+            ))}
+          </StatRow>
 
-        <StatRow>
-          <Stat>
-            <StatNumber>−60%</StatNumber>
-            <StatLabel>en moyenne</StatLabel>
-          </Stat>
-          <Stat>
-            <StatNumber>3</StatNumber>
-            <StatLabel>nouveaux paniers / jour</StatLabel>
-          </Stat>
-          <Stat>
-            <StatNumber>120+</StatNumber>
-            <StatLabel>commerces partenaires</StatLabel>
-          </Stat>
-        </StatRow>
+          <Actions>
+            <Link href="/admin/login" style={{ textDecoration: "none" }}>
+              <PrimaryBtn>Se connecter</PrimaryBtn>
+            </Link>
+            <Link href="/admin/register" style={{ textDecoration: "none" }}>
+              <SecondaryBtn>Créer un compte business</SecondaryBtn>
+            </Link>
+          </Actions>
 
-        <Actions>
-          <Link href="/admin/login" style={{ textDecoration: "none" }}>
-            <PrimaryBtn>Se connecter</PrimaryBtn>
-          </Link>
-          <Link href="/admin/register" style={{ textDecoration: "none" }}>
-            <SecondaryBtn>Créer un compte business</SecondaryBtn>
-          </Link>
-        </Actions>
+          <Foot>
+            Vous êtes un commerçant ? Rejoignez le mouvement anti-gaspi.
+          </Foot>
+        </Hero>
 
-        <Foot>
-          Vous êtes un commerçant ? Rejoignez le mouvement anti-gaspi.
-        </Foot>
-      </Hero>
+        {/* ── Colonne droite — ticket ── */}
+        <TicketWrap aria-hidden="true">
+          <OrbRing $delay={0}>
+            <OrbRingInner />
+          </OrbRing>
+          <TicketEdge $position="top" />
+          <Ticket>
+            <TicketHeader>
+              <TicketShop>Reçu du jour</TicketShop>
+              <TicketMeta>120+ commerces · Cotonou</TicketMeta>
+            </TicketHeader>
+
+            <TicketList $visible={visible}>
+              {items.map((item, i) => (
+                <TicketItem key={item.name} $index={i}>
+                  <TicketItemName>{item.name}</TicketItemName>
+                  <TicketPrices>
+                    <TicketOldPrice>{item.old} F</TicketOldPrice>
+                    <TicketNewPrice>{item.price} F</TicketNewPrice>
+                  </TicketPrices>
+                </TicketItem>
+              ))}
+            </TicketList>
+
+            <TicketTotal>
+              <TicketTotalLabel>Économie moyenne</TicketTotalLabel>
+              <TicketTotalValue>−60%</TicketTotalValue>
+            </TicketTotal>
+          </Ticket>
+          <TicketEdge $position="bottom" />
+        </TicketWrap>
+      </Main>
     </Page>
   );
 }

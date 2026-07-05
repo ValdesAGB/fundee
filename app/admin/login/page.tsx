@@ -28,7 +28,6 @@ import {
   Quote,
   Accent,
 } from "./LoginPage.styles";
-import App from "next/app";
 import AppName from "../components/AppName";
 
 export default function LoginPage() {
