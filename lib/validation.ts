@@ -36,6 +36,7 @@ export const registerBusinessSchema = z.object({
 // ============================================
 
 export const updateUserProfileSchema = z.object({
+  name: z.string().optional(),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   phone: z.string().optional(),
