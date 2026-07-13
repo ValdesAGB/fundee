@@ -34,14 +34,18 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
         });
 
         if (!result) {
-            return Errors.unauthorized('Mot de passe actuel incorrect');
+            return Errors.badRequest('Mot de passe actuel incorrect');
         }
 
         return successResponse({}, 'Mot de passe modifié avec succès');
     } catch (error: any) {
-        // better-auth throws specific errors for wrong password
-        if (error?.message?.includes('Invalid password') || error?.status === 400) {
-            return Errors.unauthorized('Mot de passe actuel incorrect');
+        // better-auth throws specific errors for wrong current password
+        if (
+            error?.message?.includes('Invalid password') ||
+            error?.message?.includes('invalid_password') ||
+            error?.status === 400
+        ) {
+            return Errors.badRequest('Mot de passe actuel incorrect');
         }
         return handleRouteError(error);
     }
