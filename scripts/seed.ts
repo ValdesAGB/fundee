@@ -124,6 +124,28 @@ async function main() {
       rating: 4.5,
       isActive: true,
     },
+    {
+      email: "etoile@valentin.com",
+      password: await hashPassword("password123"),
+      name: "Boulangerie de l'Étoile",
+      description: "Pains chauds et croustillants tous les matins",
+      phone: "+229 21 00 00 05",
+      address: "Gbégamey, Cotonou",
+      logo: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=320",
+      rating: 4.6,
+      isActive: true,
+    },
+    {
+      email: "saveurs@valentin.com",
+      password: await hashPassword("password123"),
+      name: "Restaurant Saveurs Locales",
+      description: "Le meilleur de la cuisine locale béninoise",
+      phone: "+229 21 00 00 06",
+      address: "Fidjrossè, Cotonou",
+      logo: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=320",
+      rating: 4.4,
+      isActive: true,
+    },
   ];
 
   const businesses = [];
@@ -185,7 +207,7 @@ async function main() {
       price: 600,
       stock: 20,
       images: ["https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=320"],
-      businessId: businesses[1]._id.toString(),
+      businessId: businesses[4]._id.toString(), // Boulangerie de l'Étoile
       categoryId: categories[1]._id.toString(),
       isActive: true,
       isAntiGaspillage: true,
@@ -227,6 +249,19 @@ async function main() {
       categoryId: categories[2]._id.toString(),
       isActive: true,
       isAntiGaspillage: true,
+    },
+    {
+      name: "Riz Jolof",
+      slug: "riz-jolof-seed",
+      description: "Plat de riz sénégalais parfumé aux épices",
+      price: 1500,
+      compareAtPrice: 2000,
+      stock: 30,
+      images: ["https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&q=80&w=320"],
+      businessId: businesses[5]._id.toString(), // Restaurant Saveurs Locales
+      categoryId: categories[1]._id.toString(),
+      isActive: true,
+      isAntiGaspillage: false,
     },
   ];
 
