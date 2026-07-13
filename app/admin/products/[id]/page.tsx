@@ -28,6 +28,7 @@ import {
   EditButton,
   DeleteButton,
 } from "./DetailsProduct.styled";
+import { formatCurrency } from "../../components/data/FormatNumber";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -146,14 +147,16 @@ export default function ProductDetailPage() {
 
             <InfoGrid>
               <InfoCard>
-                <InfoLabel>Prix</InfoLabel>
-                <InfoValue>${product.price}</InfoValue>
+                <InfoLabel>Prix ( FCFA )</InfoLabel>
+                <InfoValue> {formatCurrency(product.price)}</InfoValue>
               </InfoCard>
 
               <InfoCard>
-                <InfoLabel>Prix promo</InfoLabel>
+                <InfoLabel>Prix promo ( FCFA )</InfoLabel>
                 <InfoValue>
-                  {product.compareAtPrice ? `$${product.compareAtPrice}` : "—"}
+                  {product.compareAtPrice
+                    ? `${formatCurrency(product.compareAtPrice)}`
+                    : "—"}
                 </InfoValue>
               </InfoCard>
 

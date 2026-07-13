@@ -298,3 +298,20 @@ export const AGBadge = styled.div`
   font-weight: 600;
   text-align: center;
 `;
+
+export const DiscountBadge = styled.div`
+  font-family: Poppins, sans-serif;
+  font-size: 12px;
+  color: #16a34a;
+  font-weight: 600;
+  margin-top: -1px;
+  margin-bottom: 20px;
+`;
+
+export const FieldError = styled.p`
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  color: #dc2626;
+  margin-top: -14px;
+  margin-bottom: 12px;
+`;
