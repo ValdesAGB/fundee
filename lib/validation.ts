@@ -142,8 +142,8 @@ export const updateCartItemSchema = z.object({
 // ============================================
 
 export const createOrderSchema = z.object({
-  shippingAddress: z.string().min(1, "L'adresse de livraison est requise"),
-  shippingPhone: z.string().min(1, "Le numéro de téléphone est requis"),
+  shippingAddress: z.string().optional(),
+  shippingPhone: z.string().optional(),
   notes: z.string().optional(),
 });
 
