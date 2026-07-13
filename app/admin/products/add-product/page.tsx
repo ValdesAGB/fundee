@@ -31,6 +31,8 @@ import {
   SuccessTitle,
   SuccessText,
   AGBadge,
+  DiscountBadge,
+  FieldError,
 } from "./AddProduct.styles";
 
 interface Category {
@@ -62,6 +64,8 @@ export default function AddProductPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [priceError, setPriceError] = useState("");
+  const [compareAtPriceError, setCompareAtPriceError] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -76,12 +80,46 @@ export default function AddProductPage() {
     fetchCategories();
   }, []);
 
+  // ── Calcul du pourcentage de réduction ──
+  const discountPercent = (() => {
+    const price = parseFloat(formData.price);
+    const compareAt = parseFloat(formData.compareAtPrice);
+    if (!isPromo || !price || !compareAt || compareAt >= price) return null;
+    return Math.round(((price - compareAt) / price) * 100);
+  })();
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // ── Validation prix ──
+    if (name === "price") {
+      const val = parseFloat(value);
+      if (value && val < 100) {
+        setPriceError("Le prix minimum est de 100 FCFA.");
+      } else {
+        setPriceError("");
+      }
+    }
+
+    // ── Validation prix de réduction ──
+    if (name === "compareAtPrice") {
+      const val = parseFloat(value);
+      const price = parseFloat(formData.price);
+      if (value && val < 100) {
+        setCompareAtPriceError("Le prix de réduction minimum est de 100 FCFA.");
+      } else if (value && price && val >= price) {
+        setCompareAtPriceError(
+          "Le prix de réduction doit être inférieur au prix de départ.",
+        );
+      } else {
+        setCompareAtPriceError("");
+      }
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,8 +135,28 @@ export default function AddProductPage() {
     setImagePreview(e.target.value);
   };
 
-  const handleSubmit = (e: React.FormEvent) =>
-    handleAddProduct(e, {
+  const handleSubmit = (e: React.FormEvent) => {
+    // Bloque si erreurs de validation
+    if (priceError || compareAtPriceError) {
+      e.preventDefault();
+      return;
+    }
+    const price = parseFloat(formData.price);
+    if (price < 100) {
+      e.preventDefault();
+      setError("Le prix minimum est de 100 FCFA.");
+      return;
+    }
+    if (isPromo) {
+      const compareAt = parseFloat(formData.compareAtPrice);
+      if (!formData.compareAtPrice || compareAt < 100 || compareAt >= price) {
+        e.preventDefault();
+        setError("Prix de réduction invalide.");
+        return;
+      }
+    }
+
+    return handleAddProduct(e, {
       formData,
       isPromo,
       imageMode,
@@ -111,6 +169,7 @@ export default function AddProductPage() {
       router,
       onSuccess: () => setSuccess(true),
     });
+  };
 
   if (success) {
     return (
@@ -174,22 +233,30 @@ export default function AddProductPage() {
 
           <Row>
             <Column>
-              <FieldLabel>Prix</FieldLabel>
+              <FieldLabel>Prix (FCFA)</FieldLabel>
               <FieldInput
                 type="number"
                 name="price"
                 value={formData.price}
-                placeholder="0.00"
+                placeholder="Min. 100"
                 onChange={handleChange}
+                min={100}
                 required
               />
+              {priceError && <FieldError>{priceError}</FieldError>}
             </Column>
+
             <Column>
               <PromoHeader>
-                <FieldLabel>Statut : {isPromo && "En promotion"}</FieldLabel>
+                <FieldLabel style={{ marginBottom: 0 }}>
+                  Statut : {isPromo && "En promotion"}
+                </FieldLabel>
                 <Toggle
                   type="button"
-                  onClick={() => setIsPromo(!isPromo)}
+                  onClick={() => {
+                    setIsPromo(!isPromo);
+                    setCompareAtPriceError("");
+                  }}
                   $active={isPromo}
                 >
                   {isPromo ? "Désactiver" : "Activer"}
@@ -197,13 +264,25 @@ export default function AddProductPage() {
               </PromoHeader>
 
               {isPromo ? (
-                <FieldInput
-                  type="number"
-                  name="compareAtPrice"
-                  value={formData.compareAtPrice}
-                  onChange={handleChange}
-                  placeholder="Prix barré"
-                />
+                <>
+                  <FieldInput
+                    type="number"
+                    name="compareAtPrice"
+                    value={formData.compareAtPrice}
+                    onChange={handleChange}
+                    placeholder={`Max. ${parseFloat(formData.price) - 1 || "prix - 1"} FCFA`}
+                    min={100}
+                    max={parseFloat(formData.price) - 1 || undefined}
+                  />
+                  {compareAtPriceError && (
+                    <FieldError>{compareAtPriceError}</FieldError>
+                  )}
+                  {discountPercent !== null && (
+                    <DiscountBadge>
+                      ↓ {discountPercent}% de réduction
+                    </DiscountBadge>
+                  )}
+                </>
               ) : (
                 <AGBadge>Anti-gaspi (A-G)</AGBadge>
               )}
@@ -296,7 +375,9 @@ export default function AddProductPage() {
 
           {imagePreview && <ImagePreview src={imagePreview} alt="Aperçu" />}
 
-          <SubmitBtn disabled={loading}>
+          <SubmitBtn
+            disabled={loading || !!priceError || !!compareAtPriceError}
+          >
             {loading ? <Loader /> : "Ajouter le produit"}
           </SubmitBtn>
         </Card>

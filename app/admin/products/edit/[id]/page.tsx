@@ -32,6 +32,8 @@ import {
   SuccessTitle,
   SuccessText,
   AGBadge,
+  FieldError,
+  DiscountBadge,
 } from "./Edit.styles";
 
 interface Category {
@@ -57,6 +59,8 @@ export default function EditProductPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [priceError, setPriceError] = useState("");
+  const [compareAtPriceError, setCompareAtPriceError] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -117,7 +121,31 @@ export default function EditProductPage() {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "price") {
+      const val = parseFloat(value);
+      if (value && val < 100) {
+        setPriceError("Le prix minimum est de 100 FCFA.");
+      } else {
+        setPriceError("");
+      }
+    }
+
+    if (name === "compareAtPrice") {
+      const val = parseFloat(value);
+      const price = parseFloat(formData.price);
+      if (value && val < 100) {
+        setCompareAtPriceError("Le prix de réduction minimum est de 100 FCFA.");
+      } else if (value && price && val >= price) {
+        setCompareAtPriceError(
+          "Le prix de réduction doit être inférieur au prix de départ.",
+        );
+      } else {
+        setCompareAtPriceError("");
+      }
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,6 +165,23 @@ export default function EditProductPage() {
     e.preventDefault();
     setSaving(true);
     setError("");
+
+    // ── Validation ──
+    if (priceError || compareAtPriceError) return;
+
+    const price = parseFloat(formData.price);
+    if (price < 100) {
+      setError("Le prix minimum est de 100 FCFA.");
+      return;
+    }
+    if (isPromo) {
+      const compareAt = parseFloat(formData.compareAtPrice);
+      if (!formData.compareAtPrice || compareAt < 100 || compareAt >= price) {
+        setError("Prix de réduction invalide.");
+        return;
+      }
+    }
+
     try {
       // ── Image ──
       let imagePayload: string[] = [];
@@ -206,6 +251,13 @@ export default function EditProductPage() {
       setSaving(false);
     }
   };
+
+  const discountPercent = (() => {
+    const price = parseFloat(formData?.price);
+    const compareAt = parseFloat(formData?.compareAtPrice);
+    if (!isPromo || !price || !compareAt || compareAt >= price) return null;
+    return Math.round(((price - compareAt) / price) * 100);
+  })();
 
   if (loading)
     return (
@@ -299,21 +351,30 @@ export default function EditProductPage() {
 
           <Row>
             <Column>
-              <FieldLabel>Prix</FieldLabel>
+              <FieldLabel>Prix (FCFA)</FieldLabel>
               <FieldInput
                 type="number"
                 name="price"
                 value={formData.price}
+                placeholder="Min. 100"
                 onChange={handleChange}
+                min={100}
                 required
               />
+              {priceError && <FieldError>{priceError}</FieldError>}
             </Column>
+
             <Column>
               <PromoHeader>
-                <FieldLabel>Statut : {isPromo && "En promotion"}</FieldLabel>
+                <FieldLabel style={{ marginBottom: 0 }}>
+                  Statut : {isPromo ? "En promotion" : ""}
+                </FieldLabel>
                 <Toggle
                   type="button"
-                  onClick={() => setIsPromo(!isPromo)}
+                  onClick={() => {
+                    setIsPromo(!isPromo);
+                    setCompareAtPriceError("");
+                  }}
                   $active={isPromo}
                 >
                   {isPromo ? "Désactiver" : "Activer"}
@@ -321,19 +382,30 @@ export default function EditProductPage() {
               </PromoHeader>
 
               {isPromo ? (
-                <FieldInput
-                  type="number"
-                  name="compareAtPrice"
-                  value={formData.compareAtPrice}
-                  onChange={handleChange}
-                  placeholder="Prix barré"
-                />
+                <>
+                  <FieldInput
+                    type="number"
+                    name="compareAtPrice"
+                    value={formData.compareAtPrice ?? ""}
+                    onChange={handleChange}
+                    placeholder={`Max. ${parseFloat(formData.price) - 1 || "prix - 1"} FCFA`}
+                    min={100}
+                    max={parseFloat(formData.price) - 1 || undefined}
+                  />
+                  {compareAtPriceError && (
+                    <FieldError>{compareAtPriceError}</FieldError>
+                  )}
+                  {discountPercent !== null && (
+                    <DiscountBadge>
+                      ↓ {discountPercent}% de réduction
+                    </DiscountBadge>
+                  )}
+                </>
               ) : (
                 <AGBadge>Anti-gaspi (A-G)</AGBadge>
               )}
             </Column>
           </Row>
-
           <Row>
             <Column>
               <FieldLabel>Catégorie</FieldLabel>
@@ -417,7 +489,7 @@ export default function EditProductPage() {
 
           {imagePreview && <ImagePreview src={imagePreview} alt="Aperçu" />}
 
-          <SubmitBtn disabled={saving}>
+          <SubmitBtn disabled={saving || !!priceError || !!compareAtPriceError}>
             {saving ? <Loader /> : "Sauvegarder les modifications"}
           </SubmitBtn>
         </Card>

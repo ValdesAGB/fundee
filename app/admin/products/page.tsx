@@ -28,6 +28,7 @@ import {
 import DashboardTableHead from "../components/DashboardTableHead";
 import NewProductBtn from "../components/NewProductBtn";
 import DashboardActionsBtn from "../components/DashboardActionsBtn";
+import { formatCurrency } from "../components/data/FormatNumber";
 
 interface Product {
   id: string;
@@ -139,7 +140,7 @@ export default function ProductsPage() {
         {loading ? (
           <Loader />
         ) : (
-          <Table>
+          <Table className="" style={{ tableLayout: "fixed" }}>
             <DashboardTableHead />
 
             <tbody>
@@ -169,11 +170,11 @@ export default function ProductsPage() {
                         {product.category?.name || product.categoryId || "-"}
                       </CategoryBadge>
                     </td>
-                    <td>${product.price}</td>
+                    <td>{formatCurrency(product.price)}</td>
                     <td>
                       {product.compareAtPrice
-                        ? `$${product.compareAtPrice}`
-                        : "-"}
+                        ? `${formatCurrency(product.compareAtPrice)}`
+                        : "—"}
                     </td>
                     <td>{product.stock}</td>
                     <td>

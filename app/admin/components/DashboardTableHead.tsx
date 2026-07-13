@@ -6,8 +6,8 @@ export default function DashboardTableHead() {
           <th>Image</th>
           <th>Nom</th>
           <th>Catégorie</th>
-          <th>Prix</th>
-          <th>Prix Promo</th>
+          <th>Prix ( FCFA )</th>
+          <th>Prix Promo ( FCFA )</th>
           <th>Stock</th>
           <th>Statut</th>
           <th>Date d'ajout</th>
