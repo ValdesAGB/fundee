@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import crypto from "crypto";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -9,6 +10,61 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   },
 });
+
+export async function sendResetCodeEmail(
+  email: string,
+  code: string,
+): Promise<void> {
+  try {
+    await transporter.sendMail({
+      from: `"Fundee" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
+      to: email,
+      subject: "Code de réinitialisation de votre mot de passe",
+      html: `
+        <div style="font-family: Poppins, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px; background: #f9fafb;">
+          <div style="background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff6b00; margin-right: 8px;"></span>
+              <span style="font-weight: 700; font-size: 18px; color: #0f172a;">Fundee</span>
+            </div>
+
+            <h2 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 12px; text-align: center;">
+              Réinitialisation du mot de passe
+            </h2>
+
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.7; text-align: center; margin-bottom: 32px;">
+              Utilisez le code ci-dessous pour réinitialiser votre mot de passe. Ce code expire dans <strong>10 minutes</strong>.
+            </p>
+
+            <div style="text-align: center; margin-bottom: 32px;">
+              <div style="display: inline-block; padding: 20px 48px; background: #f3f4f6; border-radius: 12px; letter-spacing: 12px; font-size: 32px; font-weight: 700; color: #ff6b00; font-family: 'Courier New', monospace;">
+                ${code}
+              </div>
+            </div>
+
+            <p style="color: #9ca3af; font-size: 12px; text-align: center; line-height: 1.6;">
+              Si vous n'avez pas demandé cette réinitialisation, ignorez cet email. Votre mot de passe restera inchangé.
+            </p>
+
+            <hr style="border: none; border-top: 1px solid #f3f4f6; margin: 24px 0;" />
+
+            <p style="color: #d1d5db; font-size: 11px; text-align: center;">
+              © ${new Date().getFullYear()} Promodoro · Tous droits réservés
+            </p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (err: any) {
+    console.error("📧 Erreur sendMail →", {
+      message: err.message,
+      code: err.code,
+      command: err.command,
+      response: err.response,
+    });
+    throw err;
+  }
+}
 
 export async function sendBusinessResetPasswordEmail(
   email: string,

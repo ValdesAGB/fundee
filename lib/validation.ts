@@ -273,3 +273,11 @@ export const resetPasswordSchema = z.object({
     .string()
     .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
 });
+
+export const resetPasswordWithCodeSchema = z.object({
+  email: z.string().email("Adresse email invalide"),
+  code: z.string().length(6, "Le code doit contenir 6 caractères"),
+  newPassword: z
+    .string()
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+});
