@@ -3,6 +3,19 @@ import { auth, hashPassword } from "../lib/auth";
 
 async function main() {
   console.log("🌱 Starting database seed...");
+
+  // Clean up database
+  console.log("🧹 Cleaning up existing database collections...");
+  const collections = ["category", "user", "account", "business", "product", "promotion", "review", "session", "verification"];
+  for (const name of collections) {
+    try {
+      await db.collection(name).deleteMany({});
+      console.log(`  Wiped collection: ${name}`);
+    } catch (e) {
+      console.warn(`  Could not wipe collection: ${name}`);
+    }
+  }
+
   const authCtx = await auth.$context;
 
   // Create categories
