@@ -56,6 +56,15 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
             { $set: updateData }
         );
 
+        // Synchroniser les categoryIds dans la collection 'business' (utilisée par l'app mobile)
+        if (validation.data.categoryIds !== undefined) {
+            await db.collection('business').updateOne(
+                { _id: userId },
+                { $set: { categoryIds: validation.data.categoryIds, updatedAt: new Date() } },
+                { upsert: true }
+            );
+        }
+
         const updatedUser = await db.collection('user').findOne({ _id: userId });
 
         return successResponse({

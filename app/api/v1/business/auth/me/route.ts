@@ -59,6 +59,29 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
             { $set: updateData },
         );
 
+        // Synchroniser également dans la collection 'business'
+        // Si le business n'existe pas encore (compte créé avant la synchronisation), on l'upsert
+        const userDoc = await db.collection("user").findOne({ _id: new ObjectId(user.userId) });
+        if (userDoc) {
+            await db.collection("business").updateOne(
+                { _id: new ObjectId(user.userId) },
+                {
+                    $set: {
+                        email: userDoc.email,
+                        name: userDoc.name,
+                        description: userDoc.description || "",
+                        phone: userDoc.phone || "",
+                        address: userDoc.address || "",
+                        logo: userDoc.image || "",
+                        rating: userDoc.rating || 5.0,
+                        isActive: true,
+                        ...updateData,
+                    }
+                },
+                { upsert: true }
+            );
+        }
+
         return successResponse(
             { name, phone, description, address, categoryIds },
             "Profil mis à jour",

@@ -1,6 +1,5 @@
 import { Spinner } from "../components/dots/Loader";
 import {
-  AddCategoryBtn,
   Brand,
   BrandDot,
   BrandName,
@@ -27,9 +26,6 @@ export default function Formulaire({
   categories,
   selectedCategories,
   handleCategoryToggle,
-  newCategoryName,
-  setNewCategoryName,
-  handleAddCustomCategory,
 }: any) {
   return (
     <>
@@ -99,64 +95,39 @@ export default function Formulaire({
 
         {/* ── Catégories ── */}
         <Field>
-          <FieldLabel>Catégories de votre business</FieldLabel>
+          <FieldLabel>Catégorie de votre business</FieldLabel>
           <p style={{ fontSize: 12, color: "#888", margin: "4px 0 8px 0" }}>
-            Sélectionnez les catégories qui décrivent votre activité. Vous
-            pourrez les modifier plus tard dans les paramètres.
+            Sélectionnez la catégorie qui décrit votre activité.
           </p>
           <div
             style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}
           >
-            {categories.length === 0 ? (
-              <p style={{ color: "#888", fontSize: 14, margin: 0 }}>
-                Aucune catégorie existante. Ajoutez-en une ci-dessous.
-              </p>
-            ) : (
-              categories.map((cat: any) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => handleCategoryToggle(cat.id)}
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: 20,
-                    border: "1px solid #ddd",
-                    background: selectedCategories.includes(cat.id)
-                      ? "#ff6b00"
-                      : "#fff",
-                    color: selectedCategories.includes(cat.id)
-                      ? "#fff"
-                      : "#333",
-                    cursor: "pointer",
-                    fontSize: 14,
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {cat.icon && (
-                    <span style={{ marginRight: 6 }}>{cat.icon}</span>
-                  )}
-                  {cat.name}
-                </button>
-              ))
-            )}
-          </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <FieldInput
-              type="text"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              placeholder="Ajouter une catégorie personnalisée..."
-              style={{ flex: 1 }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAddCustomCategory();
-                }
-              }}
-            />
-            <AddCategoryBtn type="button" onClick={handleAddCustomCategory}>
-              + Ajouter
-            </AddCategoryBtn>
+            {categories.map((cat: any) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => handleCategoryToggle(cat.id)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: 20,
+                  border: "1px solid #ddd",
+                  background: selectedCategories.includes(cat.id)
+                    ? "#ff6b00"
+                    : "#fff",
+                  color: selectedCategories.includes(cat.id)
+                    ? "#fff"
+                    : "#333",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  transition: "all 0.2s",
+                }}
+              >
+                {cat.icon && (
+                  <span style={{ marginRight: 6 }}>{cat.icon}</span>
+                )}
+                {cat.name}
+              </button>
+            ))}
           </div>
         </Field>
 

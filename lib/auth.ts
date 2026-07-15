@@ -3,9 +3,38 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { bearer } from "better-auth/plugins";
 import { db } from "@/lib/db";
 import { sendBusinessResetPasswordEmail } from "@/lib/mail";
+import { ObjectId } from "mongodb";
 
 export const auth = betterAuth({
   database: mongodbAdapter(db),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          if (user.role === "BUSINESS") {
+            const now = new Date();
+            const existing = await db.collection("business").findOne({ email: user.email });
+            if (!existing) {
+              await db.collection("business").insertOne({
+                _id: new ObjectId(user.id),
+                email: user.email,
+                password: user.password,
+                name: user.name,
+                description: user.description || "",
+                phone: user.phone || "",
+                address: user.address || "",
+                logo: user.image || "",
+                rating: 5.0,
+                isActive: true,
+                createdAt: now,
+                updatedAt: now,
+              });
+            }
+          }
+        },
+      },
+    },
+  },
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
   trustedOrigins: [
     "http://localhost:3000",

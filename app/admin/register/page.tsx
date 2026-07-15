@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SlideDots from "../components/dots/Animation";
 import {
@@ -36,9 +36,14 @@ import Formulaire from "./Formulaire";
 interface Category {
   id: string;
   name: string;
-  description?: string;
   icon?: string;
 }
+
+const FIXED_CATEGORIES: Category[] = [
+  { id: "restaurants-maquis", name: "Restaurants / Maquis", icon: "🍲" },
+  { id: "epiceries-supermarches", name: "Épiceries / Supermarchés", icon: "🛒" },
+  { id: "boulangeries", name: "Boulangeries", icon: "🍞" },
+];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -54,27 +59,11 @@ export default function RegisterPage() {
     role: "BUSINESS",
   });
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories = FIXED_CATEGORIES;
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [newCategoryName, setNewCategoryName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/v1/categories");
-        const data = await res.json();
-        if (res.ok) {
-          setCategories(data.data || []);
-        }
-      } catch (err) {
-        console.error("Erreur chargement catégories", err);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -88,17 +77,6 @@ export default function RegisterPage() {
         ? prev.filter((id) => id !== categoryId)
         : [...prev, categoryId],
     );
-  };
-
-  const handleAddCustomCategory = () => {
-    if (!newCategoryName.trim()) return;
-    const customId = `custom-${Date.now()}`;
-    setCategories([
-      ...categories,
-      { id: customId, name: newCategoryName.trim() },
-    ]);
-    setSelectedCategories([...selectedCategories, customId]);
-    setNewCategoryName("");
   };
 
   const handlePhoneKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -126,11 +104,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // Only save real (global) category IDs — custom ones will be created after login
-    const realCategoryIds = selectedCategories.filter(
-      (id) => !id.startsWith("custom-"),
-    );
-
     try {
       const res = await fetch("/api/auth/sign-up/email", {
         method: "POST",
@@ -151,26 +124,14 @@ export default function RegisterPage() {
       if (!res.ok)
         throw new Error(data?.message || "Erreur lors de l'inscription");
 
-      // Save selected category IDs (custom ones excluded — user will create them after login)
-      if (realCategoryIds.length > 0) {
+      // Sauvegarde les catégories sélectionnées sur le profil business
+      if (selectedCategories.length > 0) {
         await fetch("/api/v1/user/profile", {
           method: "PUT",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ categoryIds: realCategoryIds }),
+          body: JSON.stringify({ categoryIds: selectedCategories }),
         });
-      }
-
-      // Store custom category names in localStorage so they can be created after login
-      const customNames = selectedCategories
-        .filter((id) => id.startsWith("custom-"))
-        .map((id) => categories.find((c) => c.id === id)?.name)
-        .filter(Boolean) as string[];
-      if (customNames.length > 0) {
-        localStorage.setItem(
-          "pendingCustomCategories",
-          JSON.stringify(customNames),
-        );
       }
 
       setSuccess(true);
@@ -213,9 +174,6 @@ export default function RegisterPage() {
             categories={categories}
             selectedCategories={selectedCategories}
             handleCategoryToggle={handleCategoryToggle}
-            newCategoryName={newCategoryName}
-            setNewCategoryName={setNewCategoryName}
-            handleAddCustomCategory={handleAddCustomCategory}
           />
         )}
       </Left>

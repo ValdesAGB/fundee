@@ -8,28 +8,22 @@ async function main() {
   // Create categories
   const categoriesData = [
     {
-      name: "Électronique",
-      slug: "electronics",
-      description: "Appareils électroniques et gadgets",
-      icon: "📱",
+      name: "Restaurants / Maquis",
+      slug: "restaurants-maquis",
+      description: "Restauration, maquis et fast food",
+      icon: "🍲",
     },
     {
-      name: "Alimentation",
-      slug: "food",
-      description: "Produits alimentaires et boissons",
-      icon: "🍔",
+      name: "Épiceries / Supermarchés",
+      slug: "epiceries-supermarches",
+      description: "Supermarchés, supérettes et épiceries",
+      icon: "🛒",
     },
     {
-      name: "Mode",
-      slug: "fashion",
-      description: "Vêtements et accessoires",
-      icon: "👕",
-    },
-    {
-      name: "Maison",
-      slug: "home",
-      description: "Articles pour la maison",
-      icon: "🏠",
+      name: "Boulangeries",
+      slug: "boulangeries",
+      description: "Boulangeries et pâtisseries",
+      icon: "🍞",
     },
   ];
 
@@ -149,11 +143,28 @@ async function main() {
   ];
 
   const businesses = [];
-  for (const data of businessesData) {
+  for (let i = 0; i < businessesData.length; i++) {
+    const data = businessesData[i];
+    let catIndex = 1; // Par défaut: Épiceries / Supermarchés
+    if (i === 4) catIndex = 2; // Boulangerie de l'Étoile
+    if (i === 5) catIndex = 0; // Restaurant Saveurs Locales
+
+    const categoryIdStr = categories[catIndex]._id.toString();
+    const finalData = {
+      ...data,
+      categoryIds: [categoryIdStr],
+    };
+
     let bus = await db.collection("business").findOne({ email: data.email });
     if (!bus) {
-      const result = await db.collection("business").insertOne(data);
-      bus = { ...data, _id: result.insertedId };
+      const result = await db.collection("business").insertOne(finalData);
+      bus = { ...finalData, _id: result.insertedId };
+    } else {
+      await db.collection("business").updateOne(
+        { _id: bus._id },
+        { $set: finalData }
+      );
+      bus = { ...bus, ...finalData };
     }
     businesses.push(bus);
   }
@@ -209,7 +220,7 @@ async function main() {
       stock: 20,
       images: ["https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=320"],
       businessId: businesses[4]._id.toString(), // Boulangerie de l'Étoile
-      categoryId: categories[1]._id.toString(),
+      categoryId: categories[2]._id.toString(), // Boulangeries
       isActive: true,
       isAntiGaspillage: true,
     },
@@ -261,7 +272,7 @@ async function main() {
       stock: 30,
       images: ["https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&q=80&w=320"],
       businessId: businesses[5]._id.toString(), // Restaurant Saveurs Locales
-      categoryId: categories[1]._id.toString(),
+      categoryId: categories[0]._id.toString(), // Restaurants / Maquis
       isActive: true,
       isAntiGaspillage: false,
     },

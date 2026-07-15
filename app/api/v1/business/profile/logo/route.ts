@@ -69,12 +69,21 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
         // Save new file
         await fs.writeFile(filePath, buffer);
 
-        // Update database
+        // Update database (business logo and user image)
         await db.collection('business').updateOne(
             { _id: new ObjectId(user.userId) },
             { 
                 $set: { 
                     logo: publicUrl,
+                    updatedAt: new Date()
+                } 
+            }
+        );
+        await db.collection('user').updateOne(
+            { _id: new ObjectId(user.userId) },
+            { 
+                $set: { 
+                    image: publicUrl,
                     updatedAt: new Date()
                 } 
             }
@@ -113,6 +122,15 @@ export const DELETE = requireAuth(async (request: NextRequest, user) => {
             { 
                 $set: { 
                     logo: null,
+                    updatedAt: new Date()
+                } 
+            }
+        );
+        await db.collection('user').updateOne(
+            { _id: new ObjectId(user.userId) },
+            { 
+                $set: { 
+                    image: null,
                     updatedAt: new Date()
                 } 
             }
