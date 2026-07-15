@@ -42,7 +42,7 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
             return Errors.validationError(validation.error);
         }
 
-        const { name, phone, description, address, categoryIds } = validation.data;
+        const { name, phone, description, address, categoryIds, avatar } = validation.data;
 
         const updateData: any = {
             updatedAt: new Date(),
@@ -53,6 +53,7 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
         if (description !== undefined) updateData.description = description;
         if (address !== undefined) updateData.address = address;
         if (categoryIds !== undefined) updateData.categoryIds = categoryIds;
+        if (avatar !== undefined) updateData.image = avatar;
 
         await db.collection("user").updateOne(
             { _id: new ObjectId(user.userId) },
@@ -63,6 +64,10 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
         // Si le business n'existe pas encore (compte créé avant la synchronisation), on l'upsert
         const userDoc = await db.collection("user").findOne({ _id: new ObjectId(user.userId) });
         if (userDoc) {
+            // Nettoyer updateData pour la collection business (qui stocke 'logo' au lieu de 'image')
+            const businessUpdateData = { ...updateData };
+            delete businessUpdateData.image; // Ne pas stocker le champ 'image' de user dans business
+
             await db.collection("business").updateOne(
                 { _id: new ObjectId(user.userId) },
                 {
@@ -75,7 +80,7 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
                         logo: userDoc.image || "",
                         rating: userDoc.rating || 5.0,
                         isActive: true,
-                        ...updateData,
+                        ...businessUpdateData,
                     }
                 },
                 { upsert: true }
@@ -83,7 +88,7 @@ export const PUT = requireAuth(async (request: NextRequest, user) => {
         }
 
         return successResponse(
-            { name, phone, description, address, categoryIds },
+            { name, phone, description, address, categoryIds, avatar },
             "Profil mis à jour",
         );
     } catch (error) {
