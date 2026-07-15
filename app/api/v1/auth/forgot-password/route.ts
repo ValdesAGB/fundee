@@ -17,7 +17,12 @@ export async function POST(request: NextRequest) {
 
     const { email } = validation.data;
     const code = generateCode();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
+
+    // Supprimer tous les anciens codes pour cet email avant d'en créer un nouveau
+    await db.collection("verification").deleteMany({
+      identifier: `reset-code:${email}`,
+    });
 
     await db.collection("verification").insertOne({
       identifier: `reset-code:${email}`,
