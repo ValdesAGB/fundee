@@ -62,9 +62,19 @@ export async function GET(request: NextRequest) {
                         {
                             $lookup: {
                                 from: 'category',
-                                let: { catId: { $toObjectId: '$categoryId' } },
+                                let: { catId: '$categoryId' },
                                 pipeline: [
-                                    { $match: { $expr: { $eq: ['$_id', '$$catId'] } } },
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $or: [
+                                                    { $eq: ['$_id', { $convert: { input: '$$catId', to: 'objectId', onError: null, onNull: null } }] },
+                                                    { $eq: [{ $toString: '$_id' }, '$$catId'] },
+                                                    { $eq: ['$slug', '$$catId'] }
+                                                ]
+                                            }
+                                        }
+                                    },
                                     { $project: { _id: 0, id: { $toString: '$_id' }, name: 1, slug: 1 } }
                                 ],
                                 as: 'category'
@@ -74,9 +84,20 @@ export async function GET(request: NextRequest) {
                         {
                             $lookup: {
                                 from: 'business',
-                                let: { busId: { $toObjectId: '$businessId' } },
+                                let: { busId: '$businessId' },
                                 pipeline: [
-                                    { $match: { $expr: { $eq: ['$_id', '$$busId'] } } },
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $or: [
+                                                    // businessId stocké comme ObjectId string (24 chars hex)
+                                                    { $eq: ['$_id', { $convert: { input: '$$busId', to: 'objectId', onError: null, onNull: null } }] },
+                                                    // businessId stocké comme string directement
+                                                    { $eq: [{ $toString: '$_id' }, '$$busId'] }
+                                                ]
+                                            }
+                                        }
+                                    },
                                     { $project: { _id: 0, id: { $toString: '$_id' }, name: 1, logo: 1 } }
                                 ],
                                 as: 'business'
