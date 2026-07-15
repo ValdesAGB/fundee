@@ -15,8 +15,16 @@ export async function sendResetCodeEmail(
   email: string,
   code: string,
 ): Promise<void> {
+  console.log("📧 [SMTP] Tentative envoi vers:", email);
+  console.log("📧 [SMTP] Config:", {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: process.env.SMTP_SECURE,
+    user: process.env.SMTP_USER,
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+  });
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"Fundee" <${process.env.SMTP_FROM || process.env.SMTP_USER}>`,
       to: email,
       subject: "Code de réinitialisation de votre mot de passe",
@@ -55,12 +63,20 @@ export async function sendResetCodeEmail(
         </div>
       `,
     });
+    console.log("📧 [SMTP] Résultat sendMail:", {
+      messageId: info.messageId,
+      response: info.response,
+      accepted: info.accepted,
+      rejected: info.rejected,
+      pending: info.pending,
+    });
   } catch (err: any) {
-    console.error("📧 Erreur sendMail →", {
+    console.error("📧 [SMTP] ERREUR sendMail →", {
       message: err.message,
       code: err.code,
       command: err.command,
       response: err.response,
+      responseCode: err.responseCode,
     });
     throw err;
   }
