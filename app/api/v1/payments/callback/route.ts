@@ -37,6 +37,9 @@ export async function GET(request: NextRequest) {
                         { _id: new ObjectId(orderId) },
                         { $set: { status: 'PAID', updatedAt: new Date() } }
                     );
+
+                    // Vider le panier de l'utilisateur après confirmation du paiement
+                    await db.collection('cartItem').deleteMany({ userId: order.userId });
                 } else if (transaction.status === 'canceled' || transaction.status === 'declined') {
                     await db.collection('order').updateOne(
                         { _id: new ObjectId(orderId) },

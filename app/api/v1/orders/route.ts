@@ -157,8 +157,6 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
             // but we might want to inform the user or handle it.
         }
         
-        // Clear cart
-        await db.collection('cartItem').deleteMany({ userId: user.userId });
 
         return successResponse({ 
             ...newOrder, 

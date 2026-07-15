@@ -28,6 +28,9 @@ export const PUT = requireAuth(async (request: NextRequest, user, { params }: an
             { $set: { status: 'PAID', updatedAt: new Date() } }
         );
 
+        // Vider le panier de l'utilisateur après confirmation du paiement
+        await db.collection('cartItem').deleteMany({ userId: user.userId });
+
         return successResponse(null, 'Order marked as paid successfully');
     } catch (error) {
         return handleRouteError(error);
